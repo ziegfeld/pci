@@ -124,7 +124,7 @@ namespace Enterprise
         {
             CloseStreamObject();
             SetFileName();
-            m_objFileStream = new System.IO.StreamWriter(LogPath + "\\" + FileName, true);
+            m_objFileStream = new System.IO.StreamWriter(LogPath + '\\' + FileName, true);
         }
 
         private void CloseStreamObject()
@@ -139,6 +139,7 @@ namespace Enterprise
             //if ((m_strCurrentLogDate.Month != DateAndTime.Month(DateAndTime.Now())) || (m_strCurrentLogDate.Day != DateAndTime.Day(DateAndTime.Now())) || (m_strCurrentLogDate.Year != DateAndTime.Year(DateAndTime.Now())))
             if ( m_strCurrentLogDate.ToShortDateString() != DateTime.Now.ToShortDateString())
                 SetStreamObject();
+            return false; // added LfZ there was no return in VB.NET version so default false.
         }
 
         // ###################################################################################

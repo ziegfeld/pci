@@ -15,28 +15,28 @@ namespace Enterprise
 	{
 
 		// Returns true if the bit specified in intBit is true, false if not.
-        public bool ExamineBit(byte bytToCheck, int intBit)
+        public static bool ExamineBit(byte bytToCheck, byte intBit)
 		{
             byte BitMask = Convert.ToByte(1 << (intBit - 1));
 			return ((bytToCheck & BitMask) != 0);
 		}
 
 		// Clears the bit specified in intBit in the byte given in bytByte
-		public void ClearBit(ref byte bytByte, int intBit)
+        public static void ClearBit(ref byte bytByte, int intBit)
 		{
             byte BitMaskComplement = Convert.ToByte(~ (1 << (intBit - 1)));
             bytByte &= BitMaskComplement;// Convert.ToByte(~BitMask);
 		}
 
 		// Sets the bit specified in intBit in the byte given in bytByte
-		public void SetBit(ref byte bytByte, int intBit)
+        public static void SetBit(ref byte bytByte, int intBit)
 		{
             byte BitMask = Convert.ToByte(1 << (intBit - 1));
             bytByte |= BitMask;
 		}
 
 		// Toggles the bit specified in intBit in the byte given in bytByte
-        public void ToggleBit(ref byte bytByte, int intBit)
+        public static void ToggleBit(ref byte bytByte, int intBit)
 		{
             byte BitMask = Convert.ToByte(1 << (intBit - 1));
 			bytByte ^= BitMask;

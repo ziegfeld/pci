@@ -541,21 +541,27 @@ namespace EEPM
         //'building request in the HTTP POST link adress format Lingfei
         public override string BuildRequest()
         {
-            string strReturn = "";
-            if ((!string.IsNullOrEmpty(m_arrPostValues[0])))
-                strReturn += "&" + m_arrPostValues[0] + "=" + CardType;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[1])))
-                strReturn += "&" + m_arrPostValues[1] + "=" + Number;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[2])))
-                strReturn += "&" + m_arrPostValues[2] + "=" + ExpMonth;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[3])))
-                strReturn += "&" + m_arrPostValues[3] + "=" + ExpYear;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[4])))
-                strReturn += "&" + m_arrPostValues[4] + "=" + CVVData;
-            strReturn += BuildGatewaySpecificPost();
-            if ((!string.IsNullOrEmpty(strReturn)))
-                strReturn = strReturn.Substring(1);
-            return strReturn;
+            //string strReturn = "";
+            StringBuilder strBuilder = new StringBuilder();
+            if (!string.IsNullOrEmpty(m_arrPostValues[0]))
+                strBuilder.Append('&').Append(m_arrPostValues[0]).Append('=').Append(CardType);
+                //strReturn += "&" + m_arrPostValues[0] + "=" + CardType;
+            if (!string.IsNullOrEmpty(m_arrPostValues[1]))
+                strBuilder.Append('&').Append(m_arrPostValues[1]).Append('=').Append(Number);
+                //strReturn += "&" + m_arrPostValues[1] + "=" + Number;
+            if (!string.IsNullOrEmpty(m_arrPostValues[2]))
+                strBuilder.Append('&').Append(m_arrPostValues[2]).Append('=').Append(ExpMonth);
+                //strReturn += "&" + m_arrPostValues[2] + "=" + ExpMonth;
+            if (!string.IsNullOrEmpty(m_arrPostValues[3]))
+                strBuilder.Append('&').Append(m_arrPostValues[3]).Append('=').Append(ExpYear);
+                //strReturn += "&" + m_arrPostValues[3] + "=" + ExpYear;
+            if (!string.IsNullOrEmpty(m_arrPostValues[4]))
+                strBuilder.Append('&').Append(m_arrPostValues[3]).Append('=').Append(CVVData);
+                //strReturn += "&" + m_arrPostValues[4] + "=" + CVVData;
+            strBuilder.Append(BuildGatewaySpecificPost());
+            if (strBuilder.Length != 0) strBuilder.Remove(0,1);
+            //if ((!string.IsNullOrEmpty(strReturn))) strReturn = strReturn.Substring(1);
+            return strBuilder.ToString();
         }
 
 
@@ -604,32 +610,33 @@ namespace EEPM
 
         public override string BuildRequest()
         {
-            string strReturn = "";
-            if ((!string.IsNullOrEmpty(m_arrPostValues[0])))
-                strReturn += "&" + m_arrPostValues[0] + "=" + Id;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[1])))
-                strReturn += "&" + m_arrPostValues[1] + "=" + FirstName;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[2])))
-                strReturn += "&" + m_arrPostValues[2] + "=" + LastName;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[3])))
-                strReturn += "&" + m_arrPostValues[3] + "=" + Address;
+            //string strReturn = "";
+            StringBuilder strBuilder = new StringBuilder();
+            if (!string.IsNullOrEmpty(m_arrPostValues[0]))
+                strBuilder.Append('&').Append(m_arrPostValues[0]).Append('=').Append(Id);
+            if (!string.IsNullOrEmpty(m_arrPostValues[1]))
+                strBuilder.Append('&').Append(m_arrPostValues[1]).Append('=').Append(FirstName);
+            if (!string.IsNullOrEmpty(m_arrPostValues[2]))
+                strBuilder.Append('&').Append(m_arrPostValues[2]).Append('=').Append(LastName);
+            if (!string.IsNullOrEmpty(m_arrPostValues[3]))
+                strBuilder.Append('&').Append(m_arrPostValues[3]).Append('=').Append(Address);
             //If (m_arrPostValues(4) <> "") Then strReturn &= "&" + m_arrPostValues(4) + "=" + Address2()
-            if ((!string.IsNullOrEmpty(m_arrPostValues[5])))
-                strReturn += "&" + m_arrPostValues[5] + "=" + City;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[6])))
-                strReturn += "&" + m_arrPostValues[6] + "=" + State;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[7])))
-                strReturn += "&" + m_arrPostValues[7] + "=" + Zip;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[8])))
-                strReturn += "&" + m_arrPostValues[8] + "=" + Country;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[9])))
-                strReturn += "&" + m_arrPostValues[9] + "=" + Phone;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[10])))
-                strReturn += "&" + m_arrPostValues[10] + "=" + Email;
-            strReturn += BuildGatewaySpecificPost();
-            if ((!string.IsNullOrEmpty(strReturn)))
-                strReturn = strReturn.Substring(1);
-            return strReturn;
+            if (!string.IsNullOrEmpty(m_arrPostValues[5]))
+                strBuilder.Append('&').Append(m_arrPostValues[5]).Append('=').Append(City);
+            if (!string.IsNullOrEmpty(m_arrPostValues[6))
+                strBuilder.Append('&').Append(m_arrPostValues[6]).Append('=').Append(State);
+            if (!string.IsNullOrEmpty(m_arrPostValues[7]))
+                strBuilder.Append('&').Append(m_arrPostValues[7]).Append('=').Append(Zip);
+            if (!string.IsNullOrEmpty(m_arrPostValues[8]))
+                strBuilder.Append('&').Append(m_arrPostValues[8]).Append('=').Append(Country);
+            if (!string.IsNullOrEmpty(m_arrPostValues[9]))
+                strBuilder.Append('&').Append(m_arrPostValues[9]).Append('=').Append(Phone);
+            if (!string.IsNullOrEmpty(m_arrPostValues[10]))
+                strBuilder.Append('&').Append(m_arrPostValues[10]).Append('=').Append(Email);
+
+            strBuilder.Append(BuildGatewaySpecificPost());
+            if (strBuilder.Length != 0) strBuilder.Remove(0,1);
+            return strBuilder.ToString();
         }
 
 
@@ -684,26 +691,24 @@ namespace EEPM
 
         protected override string BuildRequest()
         {
-            string strReturn = "";
-            if ((!string.IsNullOrEmpty(m_arrPostValues[0])))
-                strReturn += "&" + m_arrPostValues[0] + "=" + Gateway;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[1])))
-                strReturn += "&" + m_arrPostValues[1] + "=" + GatewayURL;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[2])))
-                strReturn += "&" + m_arrPostValues[2] + "=" + MerchantLogin;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[3])))
-                strReturn += "&" + m_arrPostValues[3] + "=" + MerchantPassword;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[4])))
-                strReturn += "&" + m_arrPostValues[4] + "=" + TransactionAmount;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[5])))
-                strReturn += "&" + m_arrPostValues[5] + "=" + TransactionDesc;
-            if ((!string.IsNullOrEmpty(m_arrPostValues[6])))
-                strReturn += "&" + m_arrPostValues[6] + "=" + InvoiceNumber;
-            strReturn += BuildGatewaySpecificPost();
-            strReturn += AddSpecialFieldsToRequest();
-            if ((!string.IsNullOrEmpty(strReturn)))
-                strReturn = strReturn.Substring(1);
-            return strReturn;
+            StringBuilder strBuilder = new StringBuilder();
+            if (!string.IsNullOrEmpty(m_arrPostValues[0]))
+                strBuilder.Append('&').Append(m_arrPostValues[0]).Append('=').Append(Gateway);
+            if (!string.IsNullOrEmpty(m_arrPostValues[1]))
+                strBuilder.Append('&').Append(m_arrPostValues[1]).Append('=').Append(GatewayURL);
+            if (!string.IsNullOrEmpty(m_arrPostValues[2]))
+                strBuilder.Append('&').Append(m_arrPostValues[2]).Append('=').Append(MerchantLogin);
+            if (!string.IsNullOrEmpty(m_arrPostValues[3]))
+                strBuilder.Append('&').Append(m_arrPostValues[3]).Append('=').Append(MerchantPassword);
+            if (!string.IsNullOrEmpty(m_arrPostValues[4]))
+                strBuilder.Append('&').Append(m_arrPostValues[4]).Append('=').Append(TransactionAmount);
+            if (!string.IsNullOrEmpty(m_arrPostValues[5]))
+                strBuilder.Append('&').Append(m_arrPostValues[5]).Append('=').Append(TransactionDesc);
+            if (!string.IsNullOrEmpty(m_arrPostValues[6))
+                strBuilder.Append('&').Append(m_arrPostValues[6]).Append('=').Append(InvoiceNumber);
+            strBuilder.Append(BuildGatewaySpecificPost());
+            if (strBuilder.Length != 0) strBuilder.Remove(0,1);
+            return strBuilder.ToString();
         }
 
         protected virtual string AddSpecialFieldsToRequest()

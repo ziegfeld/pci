@@ -125,7 +125,7 @@ namespace Enterprise
             else
             {
                 m_intResponseCode = 32;
-                m_strResponseDescription = "Base Key is Blank: " + m_strProductRoot + "\\" + m_strProductHive + "\\" + m_strProductVersion;
+                m_strResponseDescription = "Base Key is Blank: " + m_strProductRoot + '\\' + m_strProductHive + '\\' + m_strProductVersion;
             }
 
             m_objLog.LogMessage("EEBase: CheckBaseKey(): " + blnReturn, 40);

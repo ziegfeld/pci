@@ -44,33 +44,37 @@ namespace Enterprise
         // ###################################################################################
         private void InitializeMembers()
 		{
-			ManagementObject objMgmt = default(ManagementObject);
+			 //objMgmt = default(ManagementObject);
 			ManagementObjectSearcher objMgmtSearcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
 
-			foreach ( objMgmt in objMgmtSearcher.Get()) {
-				if ((Strings.InStr(objMgmt("name").ToString(), "|") > 0)) {
-					m_strWindowsOS = Strings.Mid(objMgmt("name").ToString(), 1, Strings.InStr(objMgmt("name").ToString(), "|") - 2);
-					m_strWindowsLocation = Strings.Mid(objMgmt("name").ToString(), Strings.InStr(objMgmt("name").ToString(), "|") + 1);
+			foreach (ManagementObject objMgmt in objMgmtSearcher.Get()) {
+				if (objMgmt["name"].ToString().IndexOf('|') >= 0) {
+					// = Strings.Mid(objMgmt["name"].ToString(), 1, Strings.InStr(objMgmt["name"].ToString(), "|") - 2);
+					m_strWindowsLocation = objMgmt["name"].ToString();
+                    m_strWindowsOS = m_strWindowsLocation.Substring(0, m_strWindowsLocation.IndexOf('|'));// or - 1);?
+                    m_strWindowsLocation = m_strWindowsLocation.Substring(m_strWindowsLocation.IndexOf('|') + 1);
+                       
 				} else {
-					m_strWindowsOS = objMgmt("name").ToString();
+					m_strWindowsOS = objMgmt["name"].ToString();
 				}
-				m_strComputerName = objMgmt("csname").ToString();
-				m_strWindowsRoot = objMgmt("windowsdirectory").ToString();
+				m_strComputerName = objMgmt["csname"].ToString();
+				m_strWindowsRoot = objMgmt["windowsdirectory"].ToString();
 			}
 
 			objMgmtSearcher = null;
 			objMgmtSearcher = new ManagementObjectSearcher("Select UUID From Win32_ComputerSystemProduct");
-			foreach ( objMgmt in objMgmtSearcher.Get()) {
-				m_strComputerUUID = objMgmt("UUID").ToString();
+            foreach (ManagementObject objMgmt in objMgmtSearcher.Get())
+            {
+				m_strComputerUUID = objMgmt["UUID"].ToString();
 			}
 
 			objMgmtSearcher = null;
 			objMgmtSearcher = new ManagementObjectSearcher("Select * From Win32_NetworkAdapterConfiguration");
-			foreach ( objMgmt in objMgmtSearcher.Get()) {
-				if ((objMgmt("IPEnabled").ToString() == "True")) {
-					if ((!string.IsNullOrEmpty(objMgmt("DefaultIPGateway")(0).ToString()))) {
-						m_strNetworkIPAddress = objMgmt("IPAddress")(0).ToString();
-						m_strNetworkMACAddress = objMgmt("MacAddress").ToString();
+			foreach (ManagementObject objMgmt in objMgmtSearcher.Get()) {
+				if ((objMgmt["IPEnabled"].ToString() == "True")) {
+					if ((!string.IsNullOrEmpty(objMgmt["DefaultIPGateway"].ToString()))) {
+						m_strNetworkIPAddress = objMgmt["IPAddress"].ToString();
+						m_strNetworkMACAddress = objMgmt["MacAddress"].ToString();
 						break; // TODO: might not be correct. Was : Exit For
 					}
 				}

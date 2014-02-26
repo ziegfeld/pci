@@ -222,15 +222,13 @@ namespace Enterprise
             bool blnReturn = false;
             RegistryKey objCheckKey = null;
             m_objRegKey = Registry.LocalMachine;
-            if ((blnAddBasePath))
+            if (blnAddBasePath)
                 strPath = m_strBaseKeyPath + strPath;
             try
             {
                 objCheckKey = m_objRegKey.OpenSubKey(strPath, false);
-                if ((objCheckKey != null))
-                {
+                if (objCheckKey != null)
                     blnReturn = true;
-                }
             }
             catch
             {
@@ -249,22 +247,22 @@ namespace Enterprise
             if ((string.IsNullOrEmpty(strProductHive)))
                 strProductHive = ProductHive;
 
-            string strPath = m_strBaseKeyPath + "\\";
-            if ((!string.IsNullOrEmpty(strRoot)))
-                strPath += strRoot + "\\";
-            if ((!string.IsNullOrEmpty(strInstance)))
-                strPath += strInstance + "\\";
+            System.Text.StringBuilder strPath = new System.Text.StringBuilder();
+            strPath.Append(m_strBaseKeyPath).Append('\\');
+            if (!string.IsNullOrEmpty(strRoot))
+                strPath.Append(strRoot).Append('\\');
+            if (!string.IsNullOrEmpty(strInstance))
+                strPath.Append(strInstance).Append('\\');
             if (strPath.Length <= 1)
-                strPath = "";
+                strPath.Clear();
 
-            if ((CheckPathExists(strPath + strProductHive)))
+            string strPathHive = strPath.Append(strProductHive).ToString();
+            if (CheckPathExists(strPathHive))
             {
                 objProductPath = GetPath(strPath + strProductHive);
                 string[] strSubKeys = objProductPath.GetSubKeyNames();
                 if (strSubKeys.Length != 0)
-                {
                     strReturn = strSubKeys[strSubKeys.Length - 1];
-                }
             }
             return strReturn;
         }
@@ -368,11 +366,9 @@ namespace Enterprise
 
         private RegistryKey CreateRegistryPath(string strPath, bool blnAddBasePath = false)
         {
-            RegistryKey objReturn = null;
-            int intCounter = 0;
-            string strCurrentPath = "";
-            string strLastKnownGoodPath = "";
-            string[] arrPathPieces = strCurrentPath.Split(new[]{'\\'},StringSplitOptions.None);            
+            RegistryKey objReturn = null;  
+            
+            string[] arrPathPieces = strPath.Split(new[] { '\\' }, StringSplitOptions.None);            
             m_objRegKey = Registry.LocalMachine;
             if ((blnAddBasePath))
                 strPath = m_strBaseKeyPath + strPath;
@@ -381,25 +377,26 @@ namespace Enterprise
                 return objReturn;
             try
             {
-                while (intCounter < arrPathPieces.Length)
-                {
+                string strLastKnownGoodPath = "";
+                System.Text.StringBuilder strCurrentPath = new System.Text.StringBuilder();
+                for (int intCounter = 0;intCounter < arrPathPieces.Length; intCounter ++)                
                     if (!string.IsNullOrEmpty(arrPathPieces[intCounter]))
                     {
-                        strCurrentPath = strCurrentPath + arrPathPieces[intCounter];
-                        if (!CheckPathExists(strCurrentPath))
+                        strCurrentPath.Append(arrPathPieces[intCounter]);
+                        if (!CheckPathExists(strCurrentPath.ToString()))
                         {
                             objReturn = CreateRegistryKey(strLastKnownGoodPath, arrPathPieces[intCounter]);
-                            strLastKnownGoodPath = strLastKnownGoodPath + "\\" + arrPathPieces[intCounter];
+                            //strLastKnownGoodPath = strLastKnownGoodPath + "\\" + arrPathPieces[intCounter];
+                            //?????if this condition is reached for once, any succeeding ones would be the same, just break!
+                            break;
                         }
                         else
                         {
-                            strLastKnownGoodPath = strCurrentPath;
+                            strLastKnownGoodPath = strCurrentPath.ToString();
                         }
-                        strCurrentPath = strCurrentPath + "\\";
-                        
+                        strCurrentPath.Append('\\');
                     }
-                    ++intCounter;
-                };
+
             }
             catch
             {
@@ -433,20 +430,25 @@ namespace Enterprise
 
         private string ObfuscateKey(string strKeyValue)
         {
-            string strReturn = "";
+            
+            System.Text.StringBuilder strBuilder = new System.Text.StringBuilder();
 
-            if (string.IsNullOrEmpty(strKeyValue)) return strReturn;
+            if (string.IsNullOrEmpty(strKeyValue)) return "";
 
             for (int intIndex = 0; intIndex < strKeyValue.Length; intIndex++)
             {
                 int intChar = (int)strKeyValue[intIndex];
                 intChar = intChar ^ 111; // 111= binary 111 1011 LfZ.
-                string strChar = intChar.ToString("X").PadLeft(2,'0');                
-                strReturn += strChar.Substring(strChar.Length - 2, 2);
+                //string strChar = intChar.ToString("X").PadLeft(2,'0');
+                if (intChar < 16)
+                    strBuilder.Append('0').Append(intChar.ToString("X"));
+                else
+                    strBuilder.Append(intChar.ToString("X"));
+                //strReturn += strChar.Substring(strChar.Length - 2);
                 //strReturn += Strings.Right("0" + Conversion.Hex(intChar), 2);
             }
 
-            return strReturn;
+            return strBuilder.ToString();
         }
 
         private string IlluminateKey(string strKeyValue)
@@ -455,7 +457,7 @@ namespace Enterprise
 
             if ((string.IsNullOrEmpty(strKeyValue)))
                 return strReturn;
-
+            //rewritten in c# 0226 LfZ
             for (int intIndex = 0; intIndex < strKeyValue.Length / 2; intIndex++)
             {
                 int intChar = int.Parse(strKeyValue.Substring(intIndex * 2, 2), System.Globalization.NumberStyles.HexNumber);
@@ -496,7 +498,7 @@ namespace Enterprise
             {
                 value = value.Replace( ".", "");
                 if (value.Length >= 3)
-                    value = value.Substring(1, 3);
+                    value = value.Substring(0, 3);
                 m_strProductVersion = value;
             }
         }
@@ -517,7 +519,7 @@ namespace Enterprise
         {
             get
             {
-                string strReturn = "";
+                System.Text.StringBuilder strReturn = new System.Text.StringBuilder();
                 //if (!string.IsNullOrEmpty(m_strBaseKeyPath))     strReturn += "\\\\" + m_strBaseKeyPath;
                 //if (!string.IsNullOrEmpty(m_strRoot))            strReturn += "\\\\" + m_strRoot;
                 //if (!string.IsNullOrEmpty(m_strInstance))        strReturn += "\\\\" + m_strInstance;
@@ -525,12 +527,12 @@ namespace Enterprise
                 //if (!string.IsNullOrEmpty(m_strProductVersion))  strReturn += "\\\\" + m_strProductVersion;
                 //if (strReturn.IndexOf('\\') == 0)                strReturn = strReturn.Substring(2);
                 //if (strReturn.Length != 0 )                      strReturn += "\\\\";
-                if (!string.IsNullOrEmpty(m_strBaseKeyPath)) strReturn += m_strBaseKeyPath + "\\\\";
-                if (!string.IsNullOrEmpty(m_strRoot)) strReturn += m_strRoot + "\\\\";
-                if (!string.IsNullOrEmpty(m_strInstance)) strReturn += m_strInstance + "\\\\";
-                if (!string.IsNullOrEmpty(m_strProductHive)) strReturn += m_strProductHive + "\\\\";
-                if (!string.IsNullOrEmpty(m_strProductVersion)) strReturn += m_strProductVersion + "\\\\";
-                return strReturn;
+                if (!string.IsNullOrEmpty(m_strBaseKeyPath)) strReturn.Append(m_strBaseKeyPath).Append("\\\\");
+                if (!string.IsNullOrEmpty(m_strRoot)) strReturn.Append(m_strRoot).Append("\\\\");
+                if (!string.IsNullOrEmpty(m_strInstance)) strReturn.Append(m_strInstance).Append("\\\\");
+                if (!string.IsNullOrEmpty(m_strProductHive)) strReturn.Append(m_strProductHive).Append("\\\\");
+                if (!string.IsNullOrEmpty(m_strProductVersion)) strReturn.Append(m_strProductVersion).Append("\\\\");
+                return strReturn.ToString();
             }
         }
 

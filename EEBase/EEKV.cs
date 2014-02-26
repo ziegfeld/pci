@@ -111,19 +111,15 @@ namespace Enterprise
             if ((m_strProductKey.Length != 32)  ||  (m_strProductHive.Length != 4))
                 return blnReturn;
 
-            string strCurrentChar = "";
-            int intCurrentPosition = 0;
             int intMatchesFound = 0;
             string strHiveSection = m_strProductKey.Substring(24, 4);
 
-            for (intCurrentPosition = 0; intCurrentPosition <= (Strings.Len(strHiveSection) - 1); intCurrentPosition++)
-            {
-                strCurrentChar = strHiveSection.Substring(intCurrentPosition, 1);
-                if ((strCurrentChar == m_strProductHive.Substring(2, 1)) || (strCurrentChar == m_strProductHive.Substring(3, 1)))
-                    intMatchesFound = intMatchesFound + 1;
-            }
+            for (int i = 0; i < strHiveSection.Length; i++)
+                if (strHiveSection[i] == m_strProductHive[1] || strHiveSection[i] == m_strProductHive[2])
+                    ++intMatchesFound;
+            
 
-            if ((intMatchesFound == 2))
+            if (intMatchesFound == 2)
                 blnReturn = true;
 
             m_objLog.LogMessage("EEBaseKeyChecker: CheckHive(): " + blnReturn, 40);
@@ -151,10 +147,10 @@ namespace Enterprise
 
             //TODO Add logic here to look down the number scheme to see if they have an older license issued.  
             //     Online check will confirm the older license is still valid.
-            intDivisor = Convert.ToInt32(Convert.ToInt32(m_strVersion.Substring(0, 1)) + 1);
+            intDivisor = Convert.ToInt32(m_strVersion[0]) + 1;
             if ((intDivisor > 9))
                 intDivisor = 7;
-            intExpectedRemainder = Convert.ToInt32(m_strVersion.Substring(1, 1));
+            intExpectedRemainder = Convert.ToInt32(m_strVersion[1]);
 
             foreach (int intFocalPoint_loopVariable in m_objFocalPoints)
             {
@@ -182,43 +178,34 @@ namespace Enterprise
             // Clear the list of any old data
             m_objFocalPoints.Clear();
 
-            int intCounter = 0;
-            string strCurrentCharacter = "";
-            string strCustomerNumber = m_strCustomerNumber.Substring(0, 6);
-            strCustomerNumber = strCustomerNumber.Substring(1);
+            //string strCustomerNumber = m_strCustomerNumber.Substring(0, 6);
+            //strCustomerNumber = strCustomerNumber.Substring(1);
+            // above 2 lines changed to the following. 0226 LfZ
+            string strCustomerNumber = m_strCustomerNumber.Substring(1, 5);
 
-            for (intCounter = 0; intCounter <= (Strings.Len(strCustomerNumber) - 1); intCounter++)
+            for (int intCounter = 0; intCounter < strCustomerNumber.Length; intCounter++)
             {
-                strCurrentCharacter = strCustomerNumber.Substring(intCounter, 1);
-                strCurrentCharacter = Convert.ToString(Convert.ToInt32(strCurrentCharacter) + m_intProductCeasarCipher);
+                int intCurrentChar = Convert.ToInt32(strCustomerNumber[intCounter]);
+                intCurrentChar += m_intProductCeasarCipher;
                 // We only have numbers 0 - 19 available.  Move\Remove all others.  Anything 20 or over is moved to single digits.
 
-                if (!(m_objFocalPoints.Contains(Convert.ToInt32(strCurrentCharacter))))
+                if (!(m_objFocalPoints.Contains(intCurrentChar)))
                 {
                     // New value, increase by product specified amount and add.
-                    if ((Convert.ToInt32(strCurrentCharacter) < 20))
-                        m_objFocalPoints.Add(Convert.ToInt32(strCurrentCharacter));
+                    if (intCurrentChar < 20)
+                        m_objFocalPoints.Add(intCurrentChar);
                 }
                 else
                 {
                     //   Value already exists.  Depending on it's value
-                    if ((Convert.ToInt32(strCurrentCharacter) < 10))
-                    {
-                        strCurrentCharacter = Convert.ToString(Convert.ToInt32(strCurrentCharacter) + m_intProductCeasarCipher);
-                    }
+                    if (intCurrentChar < 10)
+                        intCurrentChar += m_intProductCeasarCipher;
                     else
-                    {
-                        strCurrentCharacter = Convert.ToString(Convert.ToInt32(strCurrentCharacter) - m_intProductCeasarCipher);
-                    }
-                    if ((Strings.Len(strCurrentCharacter) >= 2) && (Convert.ToInt32(strCurrentCharacter.Substring(0, 1)) > 1))
-                    {
-                        strCurrentCharacter = strCurrentCharacter.Substring(1, 1);
-                    }
-                    if (!(m_objFocalPoints.Contains(Convert.ToInt32(strCurrentCharacter))))
-                    {
-                        if ((Convert.ToInt32(strCurrentCharacter) < 20))
-                            m_objFocalPoints.Add(Convert.ToInt32(strCurrentCharacter));
-                    }
+                        intCurrentChar -= m_intProductCeasarCipher;
+                    if (intCurrentChar >= 20)
+                        intCounter %= 10;
+                    if (!(m_objFocalPoints.Contains(intCurrentChar)))
+                            m_objFocalPoints.Add(intCurrentChar);
                 }
             }
 
@@ -310,8 +297,8 @@ namespace Enterprise
             ProductHive = "";
             ProductVersion = "";
             Instance = "";
-            m_objRequestKey = new System.Collections.ArrayList();
-            m_objConfirmationKey = new System.Collections.ArrayList();
+            m_objRequestKey = new List<char>();
+            //Lf 022614 not used. m_objConfirmationKey = new List<char>();
         }
 
         public EESpecificKeyClient(string strProductRoot, string strProductVersion, string strProductHive, EELog objLog)
@@ -361,7 +348,7 @@ namespace Enterprise
             }
             if (strSpecificString.Substring(0, 6) == "ERROR:")
             {
-                m_objLog.LogMessage("Error: " + strSpecificString.Substring(7), 1);
+                m_objLog.LogMessage("Error: " + strSpecificString.Substring(6), 1);
                 return false;
             }
                 SpecificKey = strSpecificString;
@@ -408,10 +395,10 @@ namespace Enterprise
         // ###################################################################################
         private void InitializeMembers(string strRoot = "", string strProductHive = "", string strProductVersion = "", string strInstance = "", EELog objLog = null, string strSpecificKey = "")
         {
-            m_objRequestKey = new System.Collections.ArrayList();
-            m_objConfirmationKey = new System.Collections.ArrayList();
-            m_objSpecificKey = new System.Collections.ArrayList<char>();
-            m_objSpecificKeySettings = new System.Collections.ArrayList();
+            m_objRequestKey = new List<char>();
+            // LfZ 0226: not used.  m_objConfirmationKey = new List<char>();
+            m_objSpecificKey = new List<char>();
+            m_objSpecificKeySettings = new List<bool>();
 
             Root = strRoot;
             ProductHive = strProductHive;
@@ -452,7 +439,8 @@ namespace Enterprise
             string strComputerName = "";
             string strComputerUUID = "";
 
-            string strJulianDate = Strings.Mid(DateAndTime.Year(DateAndTime.Now()).ToString(), 3) + DateAndTime.Now.DayOfYear.ToString().PadLeft(3, "0");
+            string strPseudoJulianDate = ((DateTime.Today.Year % 100) * 1000 + DateTime.Today.DayOfYear).ToString(); // DateTime.Today.DayOfYear.ToString("000");
+            //string strPseudoJulianDate = Strings.Mid(DateAndTime.Year(DateAndTime.Now()).ToString(), 3) + DateAndTime.Now.DayOfYear.ToString().PadLeft(3, "0");
             string strEEEMVersion = "";
             string strCustomerNumber = "";
             string strCustomerBaseKey = "";
@@ -493,7 +481,7 @@ namespace Enterprise
                 // Place the Year Julian Date into spaces 16-20
                 //intPlacement = 16
                 for (intCounter = 0; intCounter < 5; intCounter++)
-                    m_objRequestKey.Insert(intPlacement++, strJulianDate[intCounter]);
+                    m_objRequestKey.Insert(intPlacement++, strPseudoJulianDate[intCounter]);
 
                 // Place the Product Hive into spaces 21-24
                 //intPlacement = 21
@@ -633,7 +621,7 @@ namespace Enterprise
             {
                 strCustomerName = strCustomerName.Substring(strCustomerName.IndexOf('-') + 1, 5);//what if length of "-" to end <5?
                 //Strings.Left(Strings.Mid(strCustomerName, Strings.InStr(strCustomerName, "-") + 1), 5);
-                if (strCustomerName.Length() <= 0)
+                if (strCustomerName.Length <= 0)
                 {
                     blnReturn = false;
                     m_objLog.LogMessage("Customer Name's length is <= 0.", 35);
@@ -811,54 +799,56 @@ namespace Enterprise
 
             string strSpecificKeyDat = m_objRegistry.ProductGetKeyValue("SpecificKeyDat");
             string strSpecificKeyDatMessage = m_objRegistry.ProductGetKeyValue("SpecificKeyDatMessage");
-            int intJulianDate = Convert.ToInt32(Strings.Mid(DateAndTime.Year(DateAndTime.Now()).ToString(), 3) + DateAndTime.Now.DayOfYear.ToString().PadLeft(3, "0"));
-
+            int intPseudoJulianDate = (DateTime.Today.Year % 100) * 1000 + DateTime.Today.DayOfYear; 
+            // Convert.ToInt32(Strings.Mid(DateAndTime.Year(DateAndTime.Now()).ToString(), 3) + DateAndTime.Now.DayOfYear.ToString().PadLeft(3, "0"));
+            
             string strSpecificKeyDatResponse = null;
 
-            if ((strSpecificKeyDat.Length() > 0) && (strSpecificKeyDat.Length() == 22))
+            if (strSpecificKeyDat.Length == 22)
             {
                 // Process in the KeyDat for manipulation.                
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): strSpecificKeyDat: " + strSpecificKeyDat, 35);
-                intSKDLastSuccessfulDate = Convert.ToInt32(Strings.Mid(strSpecificKeyDat, 1, 5));
+                intSKDLastSuccessfulDate = Convert.ToInt32(strSpecificKeyDat.Substring(0, 5));
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDLastSuccessfulDate: " + intSKDLastSuccessfulDate, 35);
-                intSKDLastAttemptedDate = Convert.ToInt32(Strings.Mid(strSpecificKeyDat, 6, 5));
+                intSKDLastAttemptedDate = Convert.ToInt32(strSpecificKeyDat.Substring(5, 5));
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDLastAttemptedDate: " + intSKDLastAttemptedDate, 35);
-                intSKDFailedCommAllowed = Convert.ToInt32(Strings.Asc(Strings.Mid(strSpecificKeyDat, 11, 1)) - Strings.Asc("a"));
+                intSKDFailedCommAllowed = strSpecificKeyDat[10] -  'a';
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDFailedCommAllowed: " + intSKDFailedCommAllowed, 35);
-                intSKDMaxDailyChecksAllowed = Convert.ToInt32(Strings.Asc(Strings.Mid(strSpecificKeyDat, 13, 1)) - Strings.Asc("a"));
+                intSKDMaxDailyChecksAllowed =strSpecificKeyDat[12] -  'a';
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDMaxDailyChecksAllowed: " + intSKDMaxDailyChecksAllowed, 35);
-                intSKDDaysBetweenChecks = Convert.ToInt32(Strings.Asc(Strings.Mid(strSpecificKeyDat, 14, 1)) - Strings.Asc("a"));
+                intSKDDaysBetweenChecks = strSpecificKeyDat[13] -  'a';
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDDaysBetweenChecks: " + intSKDDaysBetweenChecks, 35);
-                intSKDDailyRandomMatches = Convert.ToInt32(Strings.Mid(strSpecificKeyDat, 15, 1));
+                intSKDDailyRandomMatches = Convert.ToInt32(strSpecificKeyDat[14]);
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDDailyRandomMatches: " + intSKDDailyRandomMatches, 35);
-                intSKDAttemptedCommTries = (Convert.ToInt32((Strings.Asc(Strings.Mid(strSpecificKeyDat, 17, 1)) - Strings.Asc("a")) * 26));
+                intSKDAttemptedCommTries = (strSpecificKeyDat[16] - 'a') * 26;
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDAttemptedCommTries: " + intSKDAttemptedCommTries, 35);
-                intSKDAttemptedCommTries += Convert.ToInt32(Strings.Asc(Strings.Mid(strSpecificKeyDat, 18, 1)) - Strings.Asc("a"));
+                intSKDAttemptedCommTries += strSpecificKeyDat[17] -  'a';
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDAttemptedCommTries: " + intSKDAttemptedCommTries, 35);
-                intSKDDaysOfFailedComm = Convert.ToInt32(Strings.Asc(Strings.Mid(strSpecificKeyDat, 19, 1)) - Strings.Asc("a"));
+                intSKDDaysOfFailedComm = strSpecificKeyDat[18] -  'a';
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDDaysOfFailedComm: " + intSKDDaysOfFailedComm, 35);
-                intSKDCountOfUsage = Convert.ToInt32(Strings.Mid(strSpecificKeyDat, 21, 2));
+                intSKDCountOfUsage = Convert.ToInt32(strSpecificKeyDat.Substring(20, 2));
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDCountOfUsage: " + intSKDCountOfUsage, 35);
             }
             else
             {
                 // Setup the SpecificKeyDat as if it has never been called.  This way it will increment and save later as expected.
                 intSKDLastSuccessfulDate = 0;
-                intSKDLastAttemptedDate = intJulianDate;
+                intSKDLastAttemptedDate = intPseudoJulianDate;
                 intSKDDailyRandomMatches = 0;
-                intSKDAttemptedCommTries = Convert.ToInt32(Strings.Asc("a"));
-                intSKDAttemptedCommTries += Convert.ToInt32(Strings.Asc("a"));
-                intSKDDaysOfFailedComm = Convert.ToInt32(Strings.Asc("a"));
+                intSKDAttemptedCommTries = 'a'; //?? *26? but actually "a" is zero
+                intSKDAttemptedCommTries += 'a'; //? but a + a is 90ish! not zero!
+                intSKDDaysOfFailedComm = 'a';
                 intSKDCountOfUsage = 0;
             }
 
-            m_objLog.LogMessage("Check Force. (strSpecificKeyDatMessage.Length > 0): " + (strSpecificKeyDatMessage.Length > 0) + " : " + strSpecificKeyDatMessage, 35);
-            if (!(blnForceCheck))
-                blnForceCheck = (strSpecificKeyDatMessage.Length > 0);
+            m_objLog.LogMessage("Check Force. (strSpecificKeyDatMessage.Length > 0): " + (strSpecificKeyDatMessage.Length > 0) + " : " + strSpecificKeyDatMessage, 35);            
+            blnForceCheck = (strSpecificKeyDatMessage.Length > 0);
             // Force if previously errored
-            m_objLog.LogMessage("Check Force. ((intJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks): " + ((intJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks) + " : " + intJulianDate + " : " + intSKDLastSuccessfulDate + " : " + intSKDDaysBetweenChecks, 35);
+            m_objLog.LogMessage("Check Force. ((intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks): "
+                + ((intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks) + " : "
+                + intPseudoJulianDate + " : " + intSKDLastSuccessfulDate + " : " + intSKDDaysBetweenChecks, 35);
             if (!(blnForceCheck))
-                blnForceCheck = ((intJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks);
+                blnForceCheck = ((intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks);
             // Force if max days allowed reached
             m_objLog.LogMessage("Check Force. (intSKDAttemptedCommTries > 0): " + (intSKDAttemptedCommTries > 0) + " : " + intSKDAttemptedCommTries, 35);
             if (!(blnForceCheck))
@@ -869,32 +859,33 @@ namespace Enterprise
 
             bool blnRandomCheck = false;
             Random objRandom = new Random(System.DateTime.Now.Millisecond);
-            string strRandomChar = Strings.Chr(objRandom.Next(65, 91));
-            string strRandomCharMatch = SpecificKey.Substring(9, 1);
+            char chrRandomChar = (char) objRandom.Next(65, 91);
+            char chrRandomCharMatch = SpecificKey[9];
             // Use the last letter of the Product Hive as the match control
-            if (!(blnForceCheck))
-                if ((strRandomCharMatch == strRandomChar))
+            if (!blnForceCheck)
+                if ((chrRandomCharMatch == chrRandomChar))
                     blnRandomCheck = (intSKDDailyRandomMatches <= intSKDMaxDailyChecksAllowed);
 
-            if ((blnRandomCheck) || (blnForceCheck))
+            if (blnRandomCheck || blnForceCheck)
             {
-                m_objLog.LogMessage("Checking Specific Key. " + strRandomChar + " : " + strRandomCharMatch + " - Force: " + blnForceCheck.ToString(), 30);
+                m_objLog.LogMessage("Checking Specific Key. " + chrRandomChar + " : " + chrRandomCharMatch + " - Force: " + blnForceCheck.ToString(), 30);
 
                 try
                 {
-                    EEKMWeb.EEKMWeb objService = GetWebServiceReference();
-                    strSpecificKeyDatResponse = objService.CheckSpecificKey(SpecificKey());
+                    EEPaymentManager.EEKMWeb.EEKMWeb objService = GetWebServiceReference();
+                    strSpecificKeyDatResponse = objService.CheckSpecificKey(SpecificKey);
                     intSKDAttemptedCommTries = 0;
                     intSKDDaysOfFailedComm = 0;
                 }
                 catch (Exception err)
                 {
                     intSKDAttemptedCommTries += 1;
-                    if ((intJulianDate > intSKDLastAttemptedDate))
+                    if ((intPseudoJulianDate > intSKDLastAttemptedDate))
                         intSKDDaysOfFailedComm += 1;
 
                     m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDAttemptedCommTries: " + intSKDAttemptedCommTries, 35);
-                    m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): (intJulianDate > intSKDLastAttemptedDate) " + (intJulianDate > intSKDLastAttemptedDate) + " - " + intJulianDate + " : " + intSKDLastAttemptedDate, 35);
+                    m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): (intPseudoJulianDate > intSKDLastAttemptedDate) "
+                        + (intPseudoJulianDate > intSKDLastAttemptedDate) + " - " + intPseudoJulianDate + " : " + intSKDLastAttemptedDate, 35);
 
                     strSpecificKeyDatMessage = "ERROR: Communication level error encountered: D" + intSKDDaysOfFailedComm + " : T" + intSKDAttemptedCommTries + " - " + err.Message;
 
@@ -924,23 +915,22 @@ namespace Enterprise
                     // Temp measure during server upgrade.  If it is a classic basic response, then fake the funk to a more verbose response.
                     // This response allows for 5 days of failed communication, three attempted communications a day, 7 days between checks.
                     if (strSpecificKeyDatResponse.Length == 5)
-                        strSpecificKeyDatResponse += "f" + Convert.ToString(strRandomChar) + "dh";
+                        strSpecificKeyDatResponse += "f" + Convert.ToString(chrRandomChar) + "dh";
 
-                    strSpecificKeyDat = "";
-                    strSpecificKeyDat += strSpecificKeyDatResponse.Substring(0, 5);
-                    strSpecificKeyDat += Convert.ToString(intJulianDate);
-                    strSpecificKeyDat += strSpecificKeyDatResponse.Substring(5, 4);
+                    strSpecificKeyDat = strSpecificKeyDatResponse.Substring(0, 5)
+                     + Convert.ToString(intPseudoJulianDate)
+                     + strSpecificKeyDatResponse.Substring(5, 4);
                 }
                 intSKDCountOfUsage = 0;
             }
             else
             {
-                m_objLog.LogMessage("SpecificKeyDat Skipped: " + intJulianDate + " : " + strSpecificKeyDat(5, 5) + " # " + strRandomChar + " : " + strRandomCharMatch, 30);
+                m_objLog.LogMessage("SpecificKeyDat Skipped: " + intPseudoJulianDate + " : " + strSpecificKeyDat.Substring(5, 5) + " # " + chrRandomChar + " : " + chrRandomCharMatch, 30);
 
                 string strOldSpecificKeyDat = strSpecificKeyDat;
                 strSpecificKeyDat = "";
                 strSpecificKeyDat += strOldSpecificKeyDat.Substring(0, 5);
-                strSpecificKeyDat += Convert.ToString(intJulianDate);
+                strSpecificKeyDat += Convert.ToString(intPseudoJulianDate);
                 strSpecificKeyDat += strOldSpecificKeyDat.Substring(10, 4);
             }
 
@@ -948,12 +938,12 @@ namespace Enterprise
                 strSpecificKeyDat += Convert.ToString(intSKDDailyRandomMatches + 1);
             else
                 strSpecificKeyDat += Convert.ToString(intSKDDailyRandomMatches);
-            strSpecificKeyDat += Convert.ToString(strRandomChar);
-            strSpecificKeyDat += Convert.ToString((int)'a' + Convert.ToInt32(intSKDAttemptedCommTries / 26));
-            strSpecificKeyDat += Convert.ToString((int)'a' + Convert.ToInt32(intSKDAttemptedCommTries % 26));
-            strSpecificKeyDat += Convert.ToString((int)'a' + intSKDDaysOfFailedComm);
-            strSpecificKeyDat += Convert.ToString(strRandomChar);
-            strSpecificKeyDat += Convert.ToString(intSKDCountOfUsage + 1).PadLeft(2, '0');
+            strSpecificKeyDat += Convert.ToString(chrRandomChar)
+                              + Convert.ToString((int)'a' + Convert.ToInt32(intSKDAttemptedCommTries / 26))
+                              + Convert.ToString((int)'a' + Convert.ToInt32(intSKDAttemptedCommTries % 26))
+                              + Convert.ToString((int)'a' + intSKDDaysOfFailedComm)
+                              + Convert.ToString(chrRandomChar)
+                              + Convert.ToString(intSKDCountOfUsage + 1).PadLeft(2, '0');
 
             m_objRegistry.ProductCreateValueEntry("SpecificKeyDat", strSpecificKeyDat);
             if ((!string.IsNullOrEmpty(strSpecificKeyDatMessage)))
@@ -973,22 +963,19 @@ namespace Enterprise
             byte bytCurrentByte = 0;
             bool StatusOfBit = false;
 
-            int intBitIndex = 0;
+            
             int intSettingIndex = 0;
-
-            EEBitwise objEEBitwise = new EEBitwise();
 
             for (int intSKIndex = 43; intSKIndex <= 54; intSKIndex += 1)
             {
-                intBitIndex = 0;
-                char chr = m_objSpecificKey[intSKIndex];
-                for (intBitIndex = 8; intBitIndex >= 1; intBitIndex += -1)
+                
+                bytCurrentByte = (byte) m_objSpecificKey[intSKIndex];
+                for (byte intBitIndex = 8; intBitIndex >= 1; intBitIndex-- )
                 {
-                    bytCurrentByte = Strings.AscW(strChar);
-                    bytCurrentByte = bytCurrentByte & 0xff;
-                    StatusOfBit = objEEBitwise.ExamineBit(bytCurrentByte, intBitIndex);
+                    //bytCurrentByte = bytCurrentByte & 255; //
+                    StatusOfBit = EEBitwise.ExamineBit(bytCurrentByte, intBitIndex);
                     m_objSpecificKeySettings.Insert(intSettingIndex, StatusOfBit);
-                    intSettingIndex += 1;
+                    ++intSettingIndex;
                 }
             }
 
@@ -1098,29 +1085,21 @@ namespace Enterprise
 
             if ((strSpecificString.Length < 78))
                 return intReturn;
-            strCurrentValue += strSpecificString.Substring(12, 1);
+            strCurrentValue += strSpecificString[12]
+                            + strSpecificString[74]
+                            + strSpecificString[11]
+                            + strSpecificString[73]
+                            + strSpecificString[71];
             // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("Mid(strSpecificString, 13, 1): " + Mid(strSpecificString, 13, 1), 120)
-            // #End If
-            strCurrentValue += strSpecificString.Substring( 75, 1);
-            // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage(" Mid(strSpecificString, 75, 1): " + Mid(strSpecificString, 75, 1), 120)
-            // #End If
-            strCurrentValue += strSpecificString.Substring( 12, 1);
-            // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("Mid(strSpecificString, 12, 1): " + Mid(strSpecificString, 12, 1), 120)
-            // #End If
-            strCurrentValue += strSpecificString.Substring( 74, 1);
-            // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("Mid(strSpecificString, 74, 1): " + Mid(strSpecificString, 74, 1), 120)
-            // #End If
-            strCurrentValue += strSpecificString.Substring( 72, 1);
-            // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("Mid(strSpecificString, 72, 1): " + Mid(strSpecificString, 72, 1), 120)
             // #End If
 
             intReturn = Convert.ToInt32(strCurrentValue);
-            intReturn += ((Strings.Asc(strSpecificString.Substring( 14, 1)) - Strings.Asc("a")) * 10000);
+            intReturn += (int) (strSpecificString[13] -  'a') * 10000;
 
             // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("EESpecificKeyClient: GetCaptureTotal(): " + intReturn, 125)
@@ -1139,15 +1118,15 @@ namespace Enterprise
             if ((intTotal > 2500000))
                 intTotal = 2500000;
 
-            string strMultiplier = ((char)((int)"a" +intTotal / 100000)).ToString();
+            char strMultiplier = (char) ('a' + intTotal / 100000);
             string strCurrentTotal = (Convert.ToString(intTotal % 100000)).PadLeft(5, '0');
 
             Random objRandom = new Random(System.DateTime.Now.Millisecond);
-            string strRandomChar = ((char)objRandom.Next(65, 91)).ToString();
+            char strRandomChar = (char) objRandom.Next(65, 91);
 
             SpecificKeyIndex(11, strRandomChar);
             // #If BLN_CLIENT_BUILD = 0 Then
-            // m_objLog.LogMessage("strRandomChar: " + strRandomChar, 120)
+            // m_objLog.LogMessage("chrRandomChar: " + chrRandomChar, 120)
             // #End If
             SpecificKeyIndex(12, strCurrentTotal[2]);
             // #If BLN_CLIENT_BUILD = 0 Then
@@ -1167,13 +1146,13 @@ namespace Enterprise
             // #End If
             SpecificKeyIndex(73, strRandomChar);
             // #If BLN_CLIENT_BUILD = 0 Then
-            // m_objLog.LogMessage("strRandomChar: " + strRandomChar, 120)
+            // m_objLog.LogMessage("chrRandomChar: " + chrRandomChar, 120)
             // #End If
-            SpecificKeyIndex(74, Strings.Mid(strCurrentTotal, 4, 1));
+            SpecificKeyIndex(74, strCurrentTotal[3]);
             // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("Mid(strCurrentTotal, 4, 1): " + Mid(strCurrentTotal, 4, 1), 120)
             // #End If
-            SpecificKeyIndex(75, Strings.Mid(strCurrentTotal, 2, 1), true);
+            SpecificKeyIndex(75, strCurrentTotal[1], true);
             // #If BLN_CLIENT_BUILD = 0 Then
             // m_objLog.LogMessage("Mid(strCurrentTotal, 2, 1): " + Mid(strCurrentTotal, 2, 1), 120)
             // m_objLog.LogMessage("EESpecificKeyClient: SetCaptureTotal(): " + SpecificKey(), 125)
@@ -1215,8 +1194,9 @@ namespace Enterprise
 
         public string ProductVersion
         {
-            get { return Strings.Replace(m_strVersion, ".", ""); }
-            set { m_strVersion = Strings.Replace(value, ".", ""); }
+            get { return m_strVersion; } 
+                // was m_strVersion.Replace(".", "");  which is redundant since . is already replaced in Setter
+            set { m_strVersion = value.Replace(".", ""); }
         }
 
         public string Instance
@@ -1228,17 +1208,11 @@ namespace Enterprise
         public string SpecificKeyRequest
         {
             get
-            {
-                string strReturn = "";
-                string strElement = null;
-                foreach (string strElement_loopVariable in m_objRequestKey)
-                {
-                    strElement = strElement_loopVariable;
-                    strReturn = strReturn + strElement;
-                }
-                //strReturn = m_objRequestKey.ToString()
-                //strReturn = String.Concat(m_objRequestKey.ToArray(GetType(String)))
-                return strReturn;
+            {                
+                System.Text.StringBuilder strBuilder = new System.Text.StringBuilder();
+                foreach (char chrCurrent in m_objRequestKey)
+                    strBuilder.Append(chrCurrent);
+                return strBuilder.ToString();
             }
         }
 
@@ -1264,13 +1238,10 @@ namespace Enterprise
         {
             get
             {
-                string strReturn = "";
-                string strElement = null;
-                foreach (char chrTemp in m_objSpecificKey)
-                {
-                    strReturn += chrTemp;
-                }
-                return strReturn;
+                System.Text.StringBuilder strBuilder = new System.Text.StringBuilder();
+                foreach (char chrCurrent in m_objSpecificKey)
+                    strBuilder.Append(chrCurrent);
+                return strBuilder.ToString();
             }
             set
             {
@@ -1285,7 +1256,7 @@ namespace Enterprise
 
         public string SpecificKeyIndex(int intIndex, char chr, bool blnSaveKey = false)
         {
-            if ((chr.Length > 1) || (chr.Length < 1))
+            if ((chr == null))
                 return "";
             m_objSpecificKey[intIndex - 1] = chr;
             string strSpecificKey = SpecificKey;
@@ -1317,12 +1288,12 @@ namespace Enterprise
 
         protected string m_strInstance;
         // Length 54
-        protected System.Collections.ArrayList<string> m_objRequestKey;
+        protected List<char> m_objRequestKey;
         // Length XX
-        protected System.Collections.ArrayList<string> m_objConfirmationKey;
+        // LfZ 0226: not used. protected List<char> m_objConfirmationKey;
 
         // Length 78
-        protected System.Collections.ArrayList<char> m_objSpecificKey;
+        protected List<char> m_objSpecificKey;
         // Length 96 (84 Useable) (12 Characters, 8 bits a character.  8th bit is never used in any octet.)
         // Following positions have no meaning as the 8th bits: 7,15,23,31,39,47,55,63,71,79,87,95
         // If the 7th bit is used (6,14,22,30,38,46,54,62,70,78,86,94) then not every other bit can be set.
@@ -1331,7 +1302,7 @@ namespace Enterprise
         // If the 7th bit is not set, then the 6th bit (5,13,22,29,37,45,53,61,69,77,85,93) must be set.
         //   This is because the minimum decimal number can be 33.  So and given byte's minimum bit set
         //   can look like this: 0010 0001.
-        protected System.Collections.ArrayList<bool> m_objSpecificKeySettings;
+        protected List<bool> m_objSpecificKeySettings;
 
         protected string m_strSpecificKeyEEEMVersion;
         protected Enterprise.EELog m_objLog;

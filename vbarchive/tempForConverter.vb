@@ -51,3 +51,36 @@ protected Reauthcapture m_objNSoftwareGWPPRefund;
 protected Refundtransaction m_objNsoftwareGWPPTx;
 
         Convert.ToString(DateAndTime.Now().Millisecond).PadLeft(4, "0");
+		
+string strPseudoJulianDate = ((DateTime.Today.Year % 100) * 1000 + DateTime.Today.DayOfYear).ToString(); // DateTime.Today.DayOfYear.ToString("000");
+		
+Strings.Asc("a")) -> (int) ('a')
+
+
+   protected string m_strInstance;
+	// Length 54
+	protected List<string> m_objRequestKey;
+	// Length XX
+	protected List<string> m_objConfirmationKey;
+
+	// Length 78
+	protected List<char> m_objSpecificKey;
+	
+	protected List<bool> m_objSpecificKeySettings;
+		
+		
+  public string SpecificKeyRequest
+	{
+		get
+		{                
+			System.Text.StringBuilder strBuilder = new System.Text.StringBuilder();
+			foreach (char chrCurrent in m_objRequestKey)
+				strBuilder.Append(chrCurrent);
+			return strBuilder.ToString();
+		}
+	}
+
+	
+string[] arrPathPieces = strPath.Split(new[] { '\\' }, StringSplitOptions.None);  
+
+

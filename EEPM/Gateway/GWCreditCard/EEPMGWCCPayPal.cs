@@ -445,20 +445,18 @@ namespace EEPM
                         m_objNSoftwareGW = new nsoftware.InPayPal.Directpayment(); //02212014 LfZ
                         m_objNSoftwareCard = new nsoftware.InPayPal.Card();
                         m_objNSoftwareCustomer = new nsoftware.InPayPal.DirectPaymentPayer();
-                        break;
-                        
+                        break;                        
                     case "TRANSACTION":                        
                         m_objNSoftwareGWPPRefund = new nsoftware.InPayPal.Reauthcapture();
-                        break;
-                        
+                        break;                        
                     case "REFUND":                        
                         m_objNSoftwareGWPPTx = new nsoftware.InPayPal.Refundtransaction();
-                        break;
-                        
+                        break;                        
 					default:
 						m_intEEPGResponseCode = 98038;
 						m_strEEPGResponseDescription = "Unknown object type requested";
 						blnReturn = false;
+                        break;
 				}
 				m_objNSoftwareGW.RuntimeLicense = "42314E334141315355425241315355424348394535303330000000000000000000000000000000004B56553458483550000054565346504D334247574D550000";
 			} catch (System.Exception err) {
