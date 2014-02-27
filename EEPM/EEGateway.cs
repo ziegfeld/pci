@@ -1,4 +1,4 @@
-﻿//using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,10 +10,10 @@ using System.Runtime.InteropServices;
 namespace EEPM
 {
 
-    [ComVisible(true), ClassInterface(ClassInterfaceType.None), Guid("D3503563-C96D-4bf5-8C6F-AF267A67DD9E")]
+    [ComVisible(true), ClassInterface(ClassInterfaceType.None), Guid("E21B4036-2B47-437A-BA7C-4FB73000F847")] //Guid("D3503563-C96D-4bf5-8C6F-AF267A67DD9E")] 
     public partial class EEGateway : Enterprise.EEBase, IEEGateway
     {
-
+        
         // ###################################################################################################################################################################
         // ###################################################################################################################################################################
         // ###################################################################################################################################################################

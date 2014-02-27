@@ -1256,7 +1256,7 @@ namespace Enterprise
 
         public string SpecificKeyIndex(int intIndex, char chr, bool blnSaveKey = false)
         {
-            if ((chr == null))
+            if ((chr == 0)) // '\0' or 0
                 return "";
             m_objSpecificKey[intIndex - 1] = chr;
             string strSpecificKey = SpecificKey;

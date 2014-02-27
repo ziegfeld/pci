@@ -5,8 +5,5 @@
     <Setting Name="EEPaymentManager_EEKMWeb_EEKMWeb" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://licensing.pcicharge.com/EEKMWeb.asmx</Value>
     </Setting>
-    <Setting Name="EEPaymentManager_com_pcicharge_licensing_EEKMWeb" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://licensing.pcicharge.com/EEKMWeb.asmx</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

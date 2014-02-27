@@ -32,15 +32,5 @@ namespace EEPaymentManager.Properties {
                 return ((string)(this["EEPaymentManager_EEKMWeb_EEKMWeb"]));
             }
         }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://licensing.pcicharge.com/EEKMWeb.asmx")]
-        public string EEPaymentManager_com_pcicharge_licensing_EEKMWeb {
-            get {
-                return ((string)(this["EEPaymentManager_com_pcicharge_licensing_EEKMWeb"]));
-            }
-        }
     }
 }

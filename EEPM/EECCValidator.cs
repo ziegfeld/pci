@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace EEPM
 {
 
-    [ComVisible(true), ClassInterface(ClassInterfaceType.None), Guid("5BBD9E4E-895E-418c-8CD4-668177666BF4")]
+    [ComVisible(true), ClassInterface(ClassInterfaceType.None), Guid("0895EC80-215A-44A0-B35F-A240977F704E")] //Guid("5BBD9E4E-895E-418c-8CD4-668177666BF4")]
     public class EECCValidator : Enterprise.EEBase, IEECCValidator
     {
 

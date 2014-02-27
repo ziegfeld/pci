@@ -623,7 +623,7 @@ namespace EEPM
             //If (m_arrPostValues(4) <> "") Then strReturn &= "&" + m_arrPostValues(4) + "=" + Address2()
             if (!string.IsNullOrEmpty(m_arrPostValues[5]))
                 strBuilder.Append('&').Append(m_arrPostValues[5]).Append('=').Append(City);
-            if (!string.IsNullOrEmpty(m_arrPostValues[6))
+            if (!string.IsNullOrEmpty(m_arrPostValues[6]))
                 strBuilder.Append('&').Append(m_arrPostValues[6]).Append('=').Append(State);
             if (!string.IsNullOrEmpty(m_arrPostValues[7]))
                 strBuilder.Append('&').Append(m_arrPostValues[7]).Append('=').Append(Zip);
@@ -704,7 +704,7 @@ namespace EEPM
                 strBuilder.Append('&').Append(m_arrPostValues[4]).Append('=').Append(TransactionAmount);
             if (!string.IsNullOrEmpty(m_arrPostValues[5]))
                 strBuilder.Append('&').Append(m_arrPostValues[5]).Append('=').Append(TransactionDesc);
-            if (!string.IsNullOrEmpty(m_arrPostValues[6))
+            if (!string.IsNullOrEmpty(m_arrPostValues[6]))
                 strBuilder.Append('&').Append(m_arrPostValues[6]).Append('=').Append(InvoiceNumber);
             strBuilder.Append(BuildGatewaySpecificPost());
             if (strBuilder.Length != 0) strBuilder.Remove(0,1);
