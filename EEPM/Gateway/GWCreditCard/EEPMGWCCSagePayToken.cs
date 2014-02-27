@@ -1,15 +1,4 @@
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using nsoftware;
-using nsoftware.InPay;
-//using nsoftware.InPay.Icharge;
-//using nsoftware.InPay.EPCard;
-//using nsoftware.InPay.EPCustomer;
-//using nsoftware.InPay.EPResponse;
 using System.Runtime.InteropServices;
 
 //Tokens will automatically be removed when the card expiry date has passed.  
@@ -22,11 +11,6 @@ using System.Runtime.InteropServices;
 //'02172014 LfZ to set it externally: use AddNameValue("CCNUMBER","yourTokenValue"); to delete it: AddNameValue("CCNUMBER","")
 // to override the CCNUMBER fed to Nsoftcard.number, another overriding PrepareGatewayMessage is coded.
 
-//' get TokenGuid here to passed back to NAV through NameValue ("Token")
-//  strTokenGuid = m_objNSoftwareGW.Config("SagePayToken")
-//' to acess: use GetNameValue("Token")
-///' to set it externally: use AddNameValue("Token","yourTokenValue" or "" to delete it)
-// cannot use process key.. do not know if this line is good. LZ
 
 namespace EEPM
 {

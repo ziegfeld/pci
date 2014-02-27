@@ -268,7 +268,7 @@ namespace EEPM
 			bool blnReturn = false;
 			m_objLog.LogMessage("EEPMGWBase: ContainKeyCheck(): " + strKey, 40);
 			blnReturn = objProperties.ContainsKey(strKey);
-			if ((blnReturn)) {
+			if (blnReturn) {
 				if ((String.IsNullOrEmpty(objProperties[strKey]))) {
 					objProperties.Remove(strKey);
 					blnReturn = false;
@@ -345,7 +345,8 @@ namespace EEPM
 				strMessage = strMessage.Replace(strValue, "xx-replaced-xx");
 			}
 			// Always replace password
-			strMessage = strMessage.Replace(m_strMerchantPassword, "xx-replaced-xx");
+            if (!string.IsNullOrEmpty(m_strMerchantPassword))
+			    strMessage = strMessage.Replace(m_strMerchantPassword, "xx-replaced-xx");
 			return strMessage;
 		}
 

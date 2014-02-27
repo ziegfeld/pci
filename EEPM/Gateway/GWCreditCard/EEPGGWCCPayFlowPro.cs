@@ -1,13 +1,5 @@
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-
-using nsoftware;
 using nsoftware.InPay;
-
+using System;
 using System.Runtime.InteropServices;
 
 namespace EEPM

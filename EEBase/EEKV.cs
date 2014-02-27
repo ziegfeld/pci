@@ -1,9 +1,5 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Enterprise
@@ -75,7 +71,7 @@ namespace Enterprise
         }
 
         protected virtual bool CheckEnd()
-        {
+        {   // why not implemented? LfZ
             m_objLog.LogMessage("EEBaseKeyChecker: CheckEnd(): ", 40);
             return true;
         }
@@ -91,11 +87,11 @@ namespace Enterprise
             bool blnReturn = false;
             m_objLog.LogMessage("EEBaseKeyChecker: CheckKeyStructure()", 40);
             blnReturn = BreakDownCustomerNumber();
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = CheckFocalPoints();
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = CheckHive();
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = CheckEnd();
             m_objLog.LogMessage("EEBaseKeyChecker: CheckKeyStructure(): " + blnReturn, 40);
             return blnReturn;
@@ -114,8 +110,9 @@ namespace Enterprise
             int intMatchesFound = 0;
             string strHiveSection = m_strProductKey.Substring(24, 4);
 
+            //check if only 2 of the 4 chars in strHiveSection matchs any of strProductHive(say, EEPM) LfZ
             for (int i = 0; i < strHiveSection.Length; i++)
-                if (strHiveSection[i] == m_strProductHive[1] || strHiveSection[i] == m_strProductHive[2])
+                if (strHiveSection[i] == m_strProductHive[2] || strHiveSection[i] == m_strProductHive[3])
                     ++intMatchesFound;
             
 
@@ -139,26 +136,20 @@ namespace Enterprise
             if ((m_objFocalPoints.Count <= 0) || (m_strProductKey.Length != 32) || (m_strVersion.Length < 3))
                 return blnReturn;
 
-            int intFocalPoint = 0;
-            int intFocalPointValue = 0;
-            int intRemainder = 0;
             int intDivisor = 0;
             int intExpectedRemainder = 0;
 
             //TODO Add logic here to look down the number scheme to see if they have an older license issued.  
             //     Online check will confirm the older license is still valid.
-            intDivisor = Convert.ToInt32(m_strVersion[0]) + 1;
+            intDivisor = (m_strVersion[0] - '0') + 1;
             if ((intDivisor > 9))
                 intDivisor = 7;
-            intExpectedRemainder = Convert.ToInt32(m_strVersion[1]);
+            intExpectedRemainder = m_strVersion[1] - '0';
 
-            foreach (int intFocalPoint_loopVariable in m_objFocalPoints)
+            foreach (int i in m_objFocalPoints)
             {
-                intFocalPoint = intFocalPoint_loopVariable;
-                char chrCurrent = m_strProductKey[intFocalPoint + 4];
-                intFocalPointValue = (int) chrCurrent;
-                intRemainder = intFocalPointValue % intDivisor;
-                if ((intRemainder != intExpectedRemainder))
+                int intFocalPointValue = m_strProductKey[i + 4] - '0';
+                if (intFocalPointValue % intDivisor != intExpectedRemainder)
                     return blnReturn;
             }
             blnReturn = true;
@@ -173,7 +164,7 @@ namespace Enterprise
             bool blnReturn = false;
             m_objLog.LogMessage("EEBaseKeyChecker: BreakDownCustomerNumber(): " + m_strCustomerNumber, 40);
             // Only perform the operation if a customer number exists and a Cipher value has been entered
-            if ((string.IsNullOrEmpty(m_strCustomerNumber)) || (m_intProductCeasarCipher < 0))
+            if (string.IsNullOrEmpty(m_strCustomerNumber) || m_intProductCeasarCipher < 0)
                 return blnReturn;
             // Clear the list of any old data
             m_objFocalPoints.Clear();
@@ -185,7 +176,7 @@ namespace Enterprise
 
             for (int intCounter = 0; intCounter < strCustomerNumber.Length; intCounter++)
             {
-                int intCurrentChar = Convert.ToInt32(strCustomerNumber[intCounter]);
+                int intCurrentChar = strCustomerNumber[intCounter] - '0';
                 intCurrentChar += m_intProductCeasarCipher;
                 // We only have numbers 0 - 19 available.  Move\Remove all others.  Anything 20 or over is moved to single digits.
 
@@ -204,7 +195,7 @@ namespace Enterprise
                         intCurrentChar -= m_intProductCeasarCipher;
                     if (intCurrentChar >= 20)
                         intCounter %= 10;
-                    if (!(m_objFocalPoints.Contains(intCurrentChar)))
+                    if (!m_objFocalPoints.Contains(intCurrentChar))
                             m_objFocalPoints.Add(intCurrentChar);
                 }
             }
@@ -327,7 +318,7 @@ namespace Enterprise
             m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKey(): " + intBitCheck + " : " + intCaptureAmount, 40);
 
             string strSpecificString = m_objRegistry.ProductGetKeyValue("SpecificKey");
-            if ((strSpecificString.Length <= 0))
+            if (strSpecificString.Length == 0)
             {
                 m_objLog.LogMessage("SpecificKey is blank.  Request in progress.", 35);
                 if ((!string.IsNullOrEmpty(BuildRequestKey())))
@@ -341,7 +332,7 @@ namespace Enterprise
                     m_objLog.LogMessage("BuildRequestKey produced no request key.", 35);
                 }
             }
-            if ((strSpecificString.Length <= 0))
+            if (strSpecificString.Length == 0)
             {
                 m_objLog.LogMessage("SpecificKey is blank and nothing was returned from request.", 35);
                 return false;
@@ -366,9 +357,9 @@ namespace Enterprise
             // Compare Version Number to Variant
             if (!CheckCustomerNumber()) return false;
             // Compare Customer Number
-            if (CheckCustomerName()) return false;
+            if (!CheckCustomerName()) return false;
             // Compare Customer Number
-            if (CheckCompUUIDParts()) return false;;
+            if (!CheckCompUUIDParts()) return false;;
             // Compare Computer UUID to Key sections
             //If (blnReturn) Then blnReturn = CheckLicenseDates() ' Check License hasn't expired.
 
@@ -513,8 +504,8 @@ namespace Enterprise
 
                 // Place last 6 characters of UUID into spaces 39-44
                 //intPlacement = 39
-                for (intCounter = 0; intCounter < 5; intCounter++)
-                    m_objRequestKey.Insert(intPlacement++, strComputerUUID[strComputerUUID.Length - 5 + intCounter]);
+                for (intCounter = strComputerUUID.Length - 6; intCounter < strComputerUUID.Length; intCounter++)
+                    m_objRequestKey.Insert(intPlacement++, strComputerUUID[intCounter]);
                 
                 // Place the Customer number into spaces 45-50
                 //intPlacement = 45
@@ -544,7 +535,7 @@ namespace Enterprise
 
             m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyLength(): ", 40);
 
-            if ((SpecificKey.Length != 78))
+            if (SpecificKey.Length != 78)
             {
                 blnReturn = false;
                 m_objLog.LogMessage("SpecificKey reported length: " + SpecificKey.Length, 30);
@@ -562,7 +553,7 @@ namespace Enterprise
             m_objLog.LogMessage("EESpecificKeyClient: CheckProductHive(): ", 40);
 
             string strCompare = SpecificKey.Substring(6, 4);
-            if ((ProductHive != strCompare))
+            if (ProductHive != strCompare)
             {
                 blnReturn = false;
                 m_objLog.LogMessage("Product Hives do not match: " + ProductHive + " != " + strCompare, 30);
@@ -632,10 +623,10 @@ namespace Enterprise
                 blnReturn = false;
                 m_objLog.LogMessage("Customer Name isn't found in the registry.", 35);
             }
-            if ((blnReturn))
+            if (blnReturn)
             {
                 strCustomerName = strCustomerName.PadRight(5, 'X');
-                if ((strCustomerName != strCompare))
+                if (strCustomerName != strCompare)
                 {
                     blnReturn = false;
                     m_objLog.LogMessage("Customer Name does not match: " + strCustomerName + " != " + strCompare, 30);
@@ -684,9 +675,9 @@ namespace Enterprise
 
             m_objLog.LogMessage("EESpecificKeyClient: CheckIdentifyingKey(): ", 40);
 
-            dynamic strBaseIdentifyingKey = m_objRegistry.ProductGetKeyValue("BaseKey").Substring(0, 4);
-            dynamic strSpecificIdentifyingKey = SpecificKey.Substring(25, 4);
-            if ((strBaseIdentifyingKey != strSpecificIdentifyingKey))
+            string strBaseIdentifyingKey = m_objRegistry.ProductGetKeyValue("BaseKey").Substring(0, 4);
+            string strSpecificIdentifyingKey = SpecificKey.Substring(25, 4);
+            if (strBaseIdentifyingKey != strSpecificIdentifyingKey)
             {
                 blnReturn = false;
                 m_objLog.LogMessage("Base Key Mismatch.  Requested: " + strBaseIdentifyingKey + ".  Today: " + strSpecificIdentifyingKey, 30);
@@ -818,7 +809,7 @@ namespace Enterprise
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDMaxDailyChecksAllowed: " + intSKDMaxDailyChecksAllowed, 35);
                 intSKDDaysBetweenChecks = strSpecificKeyDat[13] -  'a';
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDDaysBetweenChecks: " + intSKDDaysBetweenChecks, 35);
-                intSKDDailyRandomMatches = Convert.ToInt32(strSpecificKeyDat[14]);
+                intSKDDailyRandomMatches = strSpecificKeyDat[14] - '0'; //right or wrong? CInt(Mid(strSpecificKeyDat, 15, 1)) LfZ 0227
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDDailyRandomMatches: " + intSKDDailyRandomMatches, 35);
                 intSKDAttemptedCommTries = (strSpecificKeyDat[16] - 'a') * 26;
                 m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): intSKDAttemptedCommTries: " + intSKDAttemptedCommTries, 35);
@@ -939,8 +930,8 @@ namespace Enterprise
             else
                 strSpecificKeyDat += Convert.ToString(intSKDDailyRandomMatches);
             strSpecificKeyDat += Convert.ToString(chrRandomChar)
-                              + Convert.ToString((int)'a' + Convert.ToInt32(intSKDAttemptedCommTries / 26))
-                              + Convert.ToString((int)'a' + Convert.ToInt32(intSKDAttemptedCommTries % 26))
+                              + Convert.ToString((int)'a' + (intSKDAttemptedCommTries / 26))
+                              + Convert.ToString((int)'a' + (intSKDAttemptedCommTries % 26))
                               + Convert.ToString((int)'a' + intSKDDaysOfFailedComm)
                               + Convert.ToString(chrRandomChar)
                               + Convert.ToString(intSKDCountOfUsage + 1).PadLeft(2, '0');

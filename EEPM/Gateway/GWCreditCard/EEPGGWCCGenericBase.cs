@@ -1,16 +1,6 @@
-﻿using Microsoft.VisualBasic;
+﻿using nsoftware.InPay;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using nsoftware;
-using nsoftware.InPay;
-//using nsoftware.InPay.Icharge;
-//using nsoftware.InPay.EPCard;
-//using nsoftware.InPay.EPCustomer;
-//using nsoftware.InPay.EPResponse;
-
 using System.Runtime.InteropServices;
 
 namespace EEPM
@@ -228,15 +218,15 @@ namespace EEPM
             //string strTransactionAmount = "";
 
             AddToScrub(ref objProperties);
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = SetGWObject("DIRECT");
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = SetGatewayCredentials(ref objProperties);
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = PrepareGatewayMessage(ref objProperties);
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = GatewaySpecificDirectSale(ref objProperties);
-            if (!(blnReturn))
+            if (!blnReturn)
             {
                 // If the function GatewaySpecificDirectSale has not been overriden then we make the generic call.
                 // A non-overridden GatewaySpecificDirectSale is expected to return Error 98022
@@ -245,7 +235,7 @@ namespace EEPM
                     m_intEEPGResponseCode = -1;
                     m_strEEPGResponseDescription = "";
                     blnReturn = true;
-                    if ((blnReturn))
+                    if (blnReturn)
                     {
                         try
                         {
@@ -426,11 +416,11 @@ namespace EEPM
             {
                 m_objNSoftwareGW.Gateway = (IchargeGateways) m_intGatewayID;
                 // Allow for a special key to change the default gateway URL.
-                if ((ContainKeyCheck(ref objProperties, "!#GATEWAY")))
+                if (ContainKeyCheck(ref objProperties, "!#GATEWAY"))
                 {
                     m_objNSoftwareGW.GatewayURL = ProcessKey(ref objProperties, "!#GATEWAY");
                 }
-                else if ((!string.IsNullOrEmpty(m_strGatewayURL)))
+                else if (!string.IsNullOrEmpty(m_strGatewayURL))
                 {
                     m_objNSoftwareGW.GatewayURL = m_strGatewayURL;
                 }

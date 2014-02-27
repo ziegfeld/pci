@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
+﻿using System;
 
 using System.Runtime.InteropServices;
 
@@ -97,9 +92,9 @@ namespace EEPM
             m_objLog.LogMessage("EEGateway: Tokenize()", 40);
 
             // If Not (CheckInternalLicenses(123) Then Return False   '''' licensing
-            if (!(CheckReady()))
+            if (!CheckReady())
                 return "ErrorNotReady";
-            if (!(DetermineGatewayObject()))
+            if (!DetermineGatewayObject())
                 return "ErrorGatewayObject";
             return m_objEEPG.Tokenize(strPlainText, ref m_objProperties);
 
@@ -112,11 +107,11 @@ namespace EEPM
 
             m_objLog.LogMessage("EEGateway: Capture()", 40);
 
-            if (!(CheckInternalLicenses(14, Convert.ToInt32(GetNameValue("TRANSACTIONAMOUNT")))))
+            if (!CheckInternalLicenses(14, Convert.ToInt32(Math.Round(Convert.ToDecimal(GetNameValue("TRANSACTIONAMOUNT")),MidpointRounding.ToEven))))
                 return false;
-            if (!(CheckReady()))
+            if (!CheckReady())
                 return false;
-            if (!(DetermineGatewayObject()))
+            if (!DetermineGatewayObject())
                 return false;
             return m_objEEPG.Capture(ref m_objProperties);
 
@@ -127,11 +122,12 @@ namespace EEPM
 
             m_objLog.LogMessage("EEGateway: DirectSale()", 40);
 
-            if (!(CheckInternalLicenses(52, Convert.ToInt32(GetNameValue("TRANSACTIONAMOUNT")))))
+            //using banker's rounding, since it is to adding up the captured total.
+            if (!CheckInternalLicenses(52, Convert.ToInt32(Math.Round(Convert.ToDecimal(GetNameValue("TRANSACTIONAMOUNT")),MidpointRounding.ToEven))))
                 return false;
-            if (!(CheckReady()))
+            if (!CheckReady())
                 return false;
-            if (!(DetermineGatewayObject()))
+            if (!DetermineGatewayObject())
                 return false;
             return m_objEEPG.DirectSale(ref m_objProperties);
 
@@ -142,11 +138,11 @@ namespace EEPM
 
             m_objLog.LogMessage("EEGateway: Credit()", 40);
 
-            if (!(CheckInternalLicenses(74)))
+            if (!CheckInternalLicenses(74))
                 return false;
-            if (!(CheckReady()))
+            if (!CheckReady())
                 return false;
-            if (!(DetermineGatewayObject()))
+            if (!DetermineGatewayObject())
                 return false;
             return m_objEEPG.Credit(ref m_objProperties);
 
@@ -157,11 +153,11 @@ namespace EEPM
 
             m_objLog.LogMessage("EEGateway: Void()", 40);
 
-            if (!(CheckInternalLicenses(83)))
+            if (!CheckInternalLicenses(83))
                 return false;
-            if (!(CheckReady()))
+            if (!CheckReady())
                 return false;
-            if (!(DetermineGatewayObject()))
+            if (!DetermineGatewayObject())
                 return false;
             return m_objEEPG.VoidTransaction(ref m_objProperties);
 
@@ -200,7 +196,7 @@ namespace EEPM
         {
             m_objLog.LogMessage("EEGateway: GetNameValue(): " + strName, 100);
             if ((m_objProperties.ContainsKey(strName)))
-                return Convert.ToString(m_objProperties[strName]);
+                return m_objProperties[strName];
             else
                 return "";
         }
@@ -239,11 +235,11 @@ namespace EEPM
             {
                 m_intResponseCode = 98000;
                 m_strResponseDescription = "Needed variable(s) not set: ";
-                if ((m_intGatewayID == -1))
+                if (m_intGatewayID == -1)
                     m_strResponseDescription += "Gateway ID";
-                if ((m_intPaymentType == -1))
+                if (m_intPaymentType == -1)
                     m_strResponseDescription += "Payment Type";
-                if (((string.IsNullOrEmpty(m_strGatewaySecurityProfile))))
+                if (string.IsNullOrEmpty(m_strGatewaySecurityProfile))
                 {
                     m_strResponseDescription += "GatewaySecurityProfile";
                 }
@@ -403,11 +399,11 @@ namespace EEPM
                             {
                                 case "Tokens":
                                     ///' TODO test
-                                    m_objEEPG = new EEPMGWCCSagePayToken(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                                    m_objEEPG = new EEPMGWCCSagePayToken(55, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                                     break;
                                 case "Encrpytion":
                                     ///''TODO test
-                                    m_objEEPG = new EEPMGWCCSagePay(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                                    m_objEEPG = new EEPMGWCCSagePay(55, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                                     break;
                                 default:
                                     errorSecurityProfileUnsupported(m_intGatewayID);
@@ -426,7 +422,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCFDE4(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCFDE4(80, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);

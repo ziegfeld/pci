@@ -1,19 +1,7 @@
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using nsoftware;
-using nsoftware.InPay;
-//using nsoftware.InPay.Icharge;
-//using nsoftware.InPay.EPCard;
-//using nsoftware.InPay.EPCustomer;
-//using nsoftware.InPay.EPResponse;
+using System.Runtime.InteropServices;
 
 // new error code set 985xx here 01/07/2014 LfZ
-
-using System.Runtime.InteropServices;
 
 ///'  EEPMGWCCSagePay : no token involved
 ///'  EEPMGWCCSagePayToken: must have token involved

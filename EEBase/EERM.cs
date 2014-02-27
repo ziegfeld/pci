@@ -1,15 +1,6 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.Win32;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-
-using System.IO;
-using System.Threading;
 using System.Runtime.InteropServices;
-
-using Microsoft.Win32;
 
 namespace Enterprise
 {
@@ -239,12 +230,11 @@ namespace Enterprise
         protected string ReturnHighestVersion(string strRoot = "", string strInstance = "", string strProductHive = "")
         {
             string strReturn = "";
-            RegistryKey objProductPath = null;
-            if ((string.IsNullOrEmpty(strRoot)))
+            if (string.IsNullOrEmpty(strRoot))
                 strRoot = Root;
-            if ((string.IsNullOrEmpty(strInstance)))
+            if (string.IsNullOrEmpty(strInstance))
                 strInstance = Instance;
-            if ((string.IsNullOrEmpty(strProductHive)))
+            if (string.IsNullOrEmpty(strProductHive))
                 strProductHive = ProductHive;
 
             System.Text.StringBuilder strPath = new System.Text.StringBuilder();
@@ -259,7 +249,7 @@ namespace Enterprise
             string strPathHive = strPath.Append(strProductHive).ToString();
             if (CheckPathExists(strPathHive))
             {
-                objProductPath = GetPath(strPath + strProductHive);
+                RegistryKey objProductPath = GetPath(strPathHive);
                 string[] strSubKeys = objProductPath.GetSubKeyNames();
                 if (strSubKeys.Length != 0)
                     strReturn = strSubKeys[strSubKeys.Length - 1];
@@ -293,7 +283,7 @@ namespace Enterprise
             try
             {
                 objValue = objRegKey.GetValue(strEntryName);
-                if (strEntryName.Substring(0,11) == "SpecificKey")
+                if (strEntryName.Length >= 11 && strEntryName.Substring(0,11) == "SpecificKey")
                     strReturn = IlluminateKey(objValue.ToString());
                 else
                     strReturn = objValue.ToString();
@@ -527,11 +517,11 @@ namespace Enterprise
                 //if (!string.IsNullOrEmpty(m_strProductVersion))  strReturn += "\\\\" + m_strProductVersion;
                 //if (strReturn.IndexOf('\\') == 0)                strReturn = strReturn.Substring(2);
                 //if (strReturn.Length != 0 )                      strReturn += "\\\\";
-                if (!string.IsNullOrEmpty(m_strBaseKeyPath)) strReturn.Append(m_strBaseKeyPath).Append("\\\\");
-                if (!string.IsNullOrEmpty(m_strRoot)) strReturn.Append(m_strRoot).Append("\\\\");
-                if (!string.IsNullOrEmpty(m_strInstance)) strReturn.Append(m_strInstance).Append("\\\\");
-                if (!string.IsNullOrEmpty(m_strProductHive)) strReturn.Append(m_strProductHive).Append("\\\\");
-                if (!string.IsNullOrEmpty(m_strProductVersion)) strReturn.Append(m_strProductVersion).Append("\\\\");
+                if (!string.IsNullOrEmpty(m_strBaseKeyPath)) strReturn.Append(m_strBaseKeyPath).Append('\\');
+                if (!string.IsNullOrEmpty(m_strRoot)) strReturn.Append(m_strRoot).Append('\\');
+                if (!string.IsNullOrEmpty(m_strInstance)) strReturn.Append(m_strInstance).Append('\\');
+                if (!string.IsNullOrEmpty(m_strProductHive)) strReturn.Append(m_strProductHive).Append('\\');
+                if (!string.IsNullOrEmpty(m_strProductVersion)) strReturn.Append(m_strProductVersion).Append('\\');
                 return strReturn.ToString();
             }
         }

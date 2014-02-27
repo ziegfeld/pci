@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
+﻿using System;
 
 namespace Enterprise
 {
@@ -68,7 +63,7 @@ namespace Enterprise
 
             GetKeyInfo();
             blnReturn = CheckBaseKey();
-            if ((blnReturn))
+            if (blnReturn)
                 blnReturn = CheckSpecificKey(intCheckLocation, intCapturedAmount);
 
             m_objLog.LogMessage("EEBase: CheckInternalLicenses(): " + blnReturn, 40);
@@ -97,7 +92,7 @@ namespace Enterprise
             else
                 m_strCustomerNumber = strCustomerNumber;
 
-            m_objLog.LogMessage("EEBase : GetKeyInfo : Entering", 40);
+            m_objLog.LogMessage("EEBase : GetKeyInfo : Exiting", 40);
         }
 
         private bool CheckBaseKey(string strProductRoot = "", string strProductHive = "", int strProductCipherLength = 0)

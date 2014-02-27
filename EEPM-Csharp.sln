@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EEPaymentManager", "EEPayme
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestDrive", "..\Test_nSoftwareSagePayToken1220\TestDrive.vbproj", "{DF36BBD5-AA10-46DF-9434-3C73F58B22B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCsharp", "..\TestCSharp\TestCsharp.csproj", "{ED0A1930-840C-42B2-8BA5-20F47A1D0770}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{DF36BBD5-AA10-46DF-9434-3C73F58B22B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF36BBD5-AA10-46DF-9434-3C73F58B22B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF36BBD5-AA10-46DF-9434-3C73F58B22B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED0A1930-840C-42B2-8BA5-20F47A1D0770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED0A1930-840C-42B2-8BA5-20F47A1D0770}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED0A1930-840C-42B2-8BA5-20F47A1D0770}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED0A1930-840C-42B2-8BA5-20F47A1D0770}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
