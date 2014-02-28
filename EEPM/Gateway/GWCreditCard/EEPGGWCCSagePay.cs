@@ -30,7 +30,8 @@ namespace EEPM
 
 	//Partial Public Class EEGateway
 	[ComVisible(false), ClassInterface(ClassInterfaceType.None)]
-	// will only implement the part that has no token involved. GatewaySecurityProfile <> "Tokens"
+	// will only implement the part that has no token involved.
+    //GatewaySecurityProfile = "Encryption". != "Tokens"
 	public class EEPMGWCCSagePay : EEPMGWCCGenericBase
 	{
 

@@ -20,8 +20,17 @@ namespace EEPM
 		// Constructors\Destructors
 		// ###################################################################################
 		public EEPGGWCCOgone(int intGatewayID, string strGatewayURL, string strMerchantLogin, string strMerchantPassword, ref Enterprise.EELog objLog) : base(intGatewayID, strGatewayURL, strMerchantLogin, strMerchantPassword, ref objLog)
-		{
+		{           
 		}
+
+        // ###################################################################################
+        // Protected variables
+        // ###################################################################################
+        //redefine the class of these 3 objects to customed ones.
+        protected new OgoneGateway m_objNSoftwareGW;
+        protected new OgoneCard m_objNSoftwareCard;
+        protected new OgoneCustomer m_objNSoftwareCustomer;
+
 
 		// ###################################################################################
 		// Protected functions
@@ -104,11 +113,7 @@ namespace EEPM
 		}
 
 	}
-
-
-
-
-
+    
 	// ###################################################################################
 	// ###################################################################################
 	// ###################################################################################
@@ -260,7 +265,7 @@ namespace EEPM
 
 		public override void VoidTransaction(string strTransactionID)
 		{
-			TransactionId() = strTransactionID;
+			TransactionId = strTransactionID;
 
 			AddSpecialField("Operation", "DES");
 			//GatewayURL() = "https://secure.ogone.com/ncol/test/maintenancedirect.asp"
@@ -312,39 +317,39 @@ namespace EEPM
 		public override bool ParseResponseData()
 		{
 			bool blnReturn = true;
-			string strAttribute = "";
-            XmlNode objXMLNode = null;
-            XmlDocument objXMLDocument = new XmlDocument();
 
 			try {
-				objXMLDocument.LoadXml(Data);
-                
-				objXMLNode = objXMLDocument.SelectSingleNode("ncresponse");
+                XmlDocument objXMLDocument = new XmlDocument();
+                objXMLDocument.LoadXml(Data);
+                XmlElement objXMLElement = objXMLDocument.SelectSingleNode("ncresponse") as XmlElement;
 				// Throw Exeption if these required attributes are not present.
 				// Status 5 - Authorization was successful
 				// Status 9 - Direct sales was sucessful.
 				// Status 61 - Void to process offline.  No error reported.
 				// Status 91 - Capture to process offline.  No error reported.
-				if ((objXMLNode.HasAttribute("STATUS")))
-					Approved = (objXMLNode.GetAttribute("STATUS") == "5") || (objXMLNode.GetAttribute("STATUS") == "9") || (objXMLNode.GetAttribute("STATUS") == "61") || (objXMLNode.GetAttribute("STATUS") == "91");
-				else
-					throw new Exception("Failed loading response from gateway.  Missing attribute: 'STATUS'");
-				if ((objXMLNode.HasAttribute("PAYID")))
-					TransactionId = objXMLNode.GetAttribute("PAYID");
+                if ((objXMLElement.HasAttribute("STATUS")))
+                {
+                    string strAttribute = objXMLElement.GetAttribute("STATUS");
+                    Approved = (strAttribute == "5") || (strAttribute == "9") || (strAttribute == "61") || (strAttribute == "91");
+                }
+                else
+                    throw new Exception("Failed loading response from gateway.  Missing attribute: 'STATUS'");
+				if (objXMLElement.HasAttribute("PAYID"))
+					TransactionId = objXMLElement.GetAttribute("PAYID");
 				else
 					throw new Exception("Failed loading response from gateway.  Missing attribute: 'PAYID'");
-				if ((objXMLNode.HasAttribute("NCERROR")))
-					ErrorCode = objXMLNode.GetAttribute("NCERROR");
+				if (objXMLElement.HasAttribute("NCERROR"))
+					ErrorCode = objXMLElement.GetAttribute("NCERROR");
 				else
 					throw new Exception("Failed loading response from gateway.  Missing attribute: 'NCERROR'");
-				if ((objXMLNode.HasAttribute("NCERRORPLUS")))
-					ErrorText = objXMLNode.GetAttribute("NCERRORPLUS");
+				if (objXMLElement.HasAttribute("NCERRORPLUS"))
+					ErrorText = objXMLElement.GetAttribute("NCERRORPLUS");
 				else
 					throw new Exception("Failed loading response from gateway.  Missing attribute: 'NCERRORPLUS'");
 
 				// These are optional attributes.  Save data if present, but do not error if not.
-				if ((objXMLNode.HasAttribute("AAVCHECK")))
-					AVSResult = objXMLNode.GetAttribute("AAVCHECK");
+				if (objXMLElement.HasAttribute("AAVCHECK"))
+					AVSResult = objXMLElement.GetAttribute("AAVCHECK");
 			} catch (Exception err) {
 				blnReturn = false;
 				throw new Exception("Failed loading response from gateway: " + Data + " . Error message : " + err.Message);

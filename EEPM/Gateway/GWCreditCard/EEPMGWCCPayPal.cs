@@ -16,9 +16,25 @@ namespace EEPM
 		// ###################################################################################
         public EEPMGWCCPayPal(int intGatewayID, string strGatewayURL, string strMerchantLogin, string strMerchantPassword, ref Enterprise.EELog objLog, bool blnInitGWObject = true, bool blnInitGWCardObject = true, bool blnInitGWCustomerObject = true) :
             base(intGatewayID, strGatewayURL, strMerchantLogin, strMerchantPassword, ref objLog)
-		{
-            
+		{            
+            //m_objNSoftwareGW = null;
+            //m_objNSoftwareCard = null;
+            //m_objNSoftwareCustomer = null;
+            m_objNSoftwarePPRefund = null;
+            m_objNSoftwarePPTx = null;
 		}
+
+        // ###################################################################################
+        // Protected variables
+        // ###################################################################################
+
+        //Added =null initialization for Readresponse if-clause 0227 LfZ
+        // new  means override the class type
+        protected new Directpayment m_objNSoftwareGW;
+        protected Reauthcapture m_objNSoftwarePPRefund;
+        protected Refundtransaction m_objNSoftwarePPTx;
+        protected new Card m_objNSoftwareCard;
+        protected new DirectPaymentPayer m_objNSoftwareCustomer;
 
 		// ###################################################################################
 		// Public functions
@@ -61,19 +77,16 @@ namespace EEPM
 					if (ContainKeyCheck(ref objProperties, "TRANSACTIONID")) {
 						strTransactionID = ProcessKey(ref objProperties, "TRANSACTIONID");
 						if (ContainKeyCheck(ref objProperties, "TRANSACTIONDESC"))
-                            m_objNSoftwareGWPPRefund.Note = ProcessKey(ref objProperties, "TRANSACTIONDESC");
+                            m_objNSoftwarePPRefund.Note = ProcessKey(ref objProperties, "TRANSACTIONDESC");
                             //m_objNSoftwareGW.OrderDescription = ProcessKey(ref objProperties, "TRANSACTIONDESC");
 						if (ContainKeyCheck(ref objProperties, "TRANSACTIONDOCUMENTNUMBER"))
 							ProcessKey(ref objProperties, "TRANSACTIONDOCUMENTNUMBER");
 						if (ContainKeyCheck(ref objProperties, "TRANSACTIONORIGINALAMOUNT")) {
 							strTransactionOriginalAmount = ProcessKey(ref objProperties, "TRANSACTIONORIGINALAMOUNT");
-							if ((Convert.ToDouble(strTransactionAmount) < Convert.ToDouble(strTransactionOriginalAmount))) {
-								m_objNSoftwareGWPPRefund.IsPartialCapture = true;
-							} else {
-                                m_objNSoftwareGWPPRefund.IsPartialCapture = false;
-							}
+                            //payflow guide.pdf p32 Delayed Capture Transaction: Capturing Transactions for Lower Amounts 0228 LfZ
+                            m_objNSoftwarePPRefund.IsPartialCapture = (Convert.ToDouble(strTransactionAmount) < Convert.ToDouble(strTransactionOriginalAmount));
 						}
-                        m_objNSoftwareGWPPRefund.Capture(strTransactionID, strTransactionAmount);
+                        m_objNSoftwarePPRefund.Capture(strTransactionID, strTransactionAmount);
 						objProperties.Clear();
 					} else {
 						m_intEEPGResponseCode = 98042;
@@ -136,18 +149,15 @@ namespace EEPM
 					if (ContainKeyCheck(ref objProperties, "TRANSACTIONID")) {
 						strTransactionID = ProcessKey(ref objProperties, "TRANSACTIONID");
 						if (ContainKeyCheck(ref objProperties, "TRANSACTIONDESC"))
-                            m_objNSoftwareGWPPTx.Memo = ProcessKey(ref objProperties, "TRANSACTIONDESC");
+                            m_objNSoftwarePPTx.Memo = ProcessKey(ref objProperties, "TRANSACTIONDESC");
 						if (ContainKeyCheck(ref objProperties, "TRANSACTIONDOCUMENTNUMBER"))
 							ProcessKey(ref objProperties, "TRANSACTIONDOCUMENTNUMBER");
 						if (ContainKeyCheck(ref objProperties, "TRANSACTIONORIGINALAMOUNT")) {
 							strTransactionOriginalAmount = ProcessKey(ref objProperties, "TRANSACTIONORIGINALAMOUNT");
-							if ((Convert.ToDouble(strTransactionAmount) < Convert.ToDouble(strTransactionOriginalAmount))) {
-                                m_objNSoftwareGWPPTx.RefundType = RefundtransactionRefundTypes.rtPartial;
-							} else {
-                                m_objNSoftwareGWPPTx.RefundType = RefundtransactionRefundTypes.rtFull;
-							}
+							m_objNSoftwarePPTx.RefundType = (Convert.ToDouble(strTransactionAmount) < Convert.ToDouble(strTransactionOriginalAmount)) ?  
+                                RefundtransactionRefundTypes.rtPartial :  RefundtransactionRefundTypes.rtFull;							
 						}
-                        m_objNSoftwareGWPPTx.Refund(strTransactionID);
+                        m_objNSoftwarePPTx.Refund(strTransactionID);
 						objProperties.Clear();
 					} else {
 						m_intEEPGResponseCode = 98047;
@@ -173,18 +183,17 @@ namespace EEPM
 		{
 			bool blnReturn = true;
 			string strTransactionID = "";
-			//string strTransactionAmount = "";
+			string strTransactionAmount = "";
 
 			try {
 				if (ContainKeyCheck(ref objProperties, "TRANSACTIONID")) {
 					strTransactionID = ProcessKey(ref objProperties, "TRANSACTIONID");
-					if (ContainKeyCheck(ref objProperties, "TRANSACTIONAMOUNT"))
-						ProcessKey(ref objProperties, "TRANSACTIONAMOUNT");
+                    strTransactionAmount = ProcessKey(ref objProperties, "TRANSACTIONAMOUNT");
 					if (ContainKeyCheck(ref objProperties, "TRANSACTIONDESC"))
-                        m_objNSoftwareGWPPRefund.Note = ProcessKey(ref objProperties, "TRANSACTIONDESC");
+                        m_objNSoftwarePPRefund.Note = ProcessKey(ref objProperties, "TRANSACTIONDESC");
 					if (ContainKeyCheck(ref objProperties, "TRANSACTIONDOCUMENTNUMBER"))
 						ProcessKey(ref objProperties, "TRANSACTIONDOCUMENTNUMBER");
-                    m_objNSoftwareGWPPRefund.VoidTransaction(strTransactionID);
+                    m_objNSoftwarePPRefund.VoidTransaction(strTransactionID);
 					objProperties.Clear();
 				} else {
 					m_intEEPGResponseCode = 98050;
@@ -232,10 +241,11 @@ namespace EEPM
 		{
 			bool blnReturn = true;
 			// Build the card object
-			if ((m_objNSoftwareCard != null)) {
+			if (m_objNSoftwareCard != null) {
 				try {
 					if (ContainKeyCheck(ref objProperties, "CCTYPE"))
 						m_objNSoftwareCard.CardType =  (CardTypes) Convert.ToInt32(ProcessKey(ref objProperties, "CCTYPE"));
+                        // This is different from GenericBase, the CardTypes instead of TCardTypes.
 					if (ContainKeyCheck(ref objProperties, "CCNUMBER"))
 						m_objNSoftwareCard.Number = ProcessKey(ref objProperties, "CCNUMBER");
 					if (ContainKeyCheck(ref objProperties, "CCEXPMONTH"))
@@ -244,6 +254,7 @@ namespace EEPM
 						m_objNSoftwareCard.ExpYear = Convert.ToInt32(ProcessKey(ref objProperties, "CCEXPYEAR"));
 					if (ContainKeyCheck(ref objProperties, "CCCCV"))
 						m_objNSoftwareCard.CVV = ProcessKey(ref objProperties, "CCCCV");
+                    // This is different from GenericBase, .CVV instead of .CVVData.
 					m_objNSoftwareGW.Card = m_objNSoftwareCard;
 				} catch (System.Exception err)
                 {
@@ -251,17 +262,12 @@ namespace EEPM
                     m_strEEPGResponseDescription = "Error:  " + err.Message;
 					blnReturn = false;
 				}
-			} else {
-				if (ContainKeyCheck(ref objProperties, "CCTYPE"))
-					ProcessKey(ref objProperties, "CCTYPE");
-				if (ContainKeyCheck(ref objProperties, "CCNUMBER"))
-					ProcessKey(ref objProperties, "CCNUMBER");
-				if (ContainKeyCheck(ref objProperties, "CCEXPMONTH"))
-					ProcessKey(ref objProperties, "CCEXPMONTH");
-				if (ContainKeyCheck(ref objProperties, "CCEXPYEAR"))
-					ProcessKey(ref objProperties, "CCEXPYEAR");
-				if (ContainKeyCheck(ref objProperties, "CCCCV"))
-					ProcessKey(ref objProperties, "CCCCV");
+			} else { // just clean them up
+				ProcessKey(ref objProperties, "CCTYPE");
+				ProcessKey(ref objProperties, "CCNUMBER");
+				ProcessKey(ref objProperties, "CCEXPMONTH");
+				ProcessKey(ref objProperties, "CCEXPYEAR");
+				ProcessKey(ref objProperties, "CCCCV");
 			}
 			// Build the customer object
 			if ((m_objNSoftwareCustomer != null)) {
@@ -292,27 +298,17 @@ namespace EEPM
 					blnReturn = false;
 				}
 			} else {
-				if (ContainKeyCheck(ref objProperties, "FNAME"))
-					ProcessKey(ref objProperties, "FNAME");
-				if (ContainKeyCheck(ref objProperties, "ADDRESSNUMBER"))
-					ProcessKey(ref objProperties, "ADDRESSNUMBER");
-				if (ContainKeyCheck(ref objProperties, "ADDRESS"))
-					ProcessKey(ref objProperties, "ADDRESS");
-				if (ContainKeyCheck(ref objProperties, "CITY"))
-					ProcessKey(ref objProperties, "CITY");
-				if (ContainKeyCheck(ref objProperties, "STATE"))
-					ProcessKey(ref objProperties, "STATE");
-				if (ContainKeyCheck(ref objProperties, "ZIPCODE"))
-					ProcessKey(ref objProperties, "ZIPCODE");
-				if (ContainKeyCheck(ref objProperties, "COUNTRYCODE"))
-					ProcessKey(ref objProperties, "COUNTRYCODE");
-				if (ContainKeyCheck(ref objProperties, "EMAIL"))
-					ProcessKey(ref objProperties, "EMAIL");
+				ProcessKey(ref objProperties, "FNAME");
+				ProcessKey(ref objProperties, "ADDRESSNUMBER");
+				ProcessKey(ref objProperties, "ADDRESS");
+				ProcessKey(ref objProperties, "CITY");
+				ProcessKey(ref objProperties, "STATE");
+				ProcessKey(ref objProperties, "ZIPCODE");
+				ProcessKey(ref objProperties, "COUNTRYCODE");
+				ProcessKey(ref objProperties, "EMAIL");
 			}
-
-			blnReturn = GatewaySpecificMessageSetup(ref objProperties);
-			blnReturn = SetSpecialFields(ref objProperties);
-
+            blnReturn = GatewaySpecificMessageSetup(ref objProperties);
+            blnReturn = SetSpecialFields(ref objProperties);
 			return blnReturn;
 		}
 
@@ -320,55 +316,54 @@ namespace EEPM
 		{
 			bool blnReturn = true;
 			try {
-                if (m_objNSoftwareGWPPRefund != null)
+                if (m_objNSoftwarePPRefund != null)
                 {
                     Payment objNSoftwareResponse = new nsoftware.InPayPal.Payment();
-                    if ((m_objNSoftwareGW.Ack != "Success") && (m_objNSoftwareGW.Ack != "SuccessWithWarning"))
+                    if ((m_objNSoftwarePPRefund.Ack != "Success") && (m_objNSoftwarePPRefund.Ack != "SuccessWithWarning"))
                     {
                         // The two following variables are included to log someday
                         m_strGatewayResponseCode = "999999";
-                        m_strGatewayResponseRawData = m_objNSoftwareGW.Ack;
+                        m_strGatewayResponseRawData = m_objNSoftwarePPRefund.Ack;
                         m_strGatewayResponseDescription = "Failed request from PayPal";
                         // The two following variables are what is sent back to the caller
                         m_intEEPGResponseCode = 98058;
-                        m_strEEPGResponseDescription = "Error:  " + m_objNSoftwareGW.Ack;
+                        m_strEEPGResponseDescription = "Error:  " + m_objNSoftwarePPRefund.Ack;
                         blnReturn = false;
                     }
                     else
                     {
                         objProperties.Add("TRANSACTIONID", objNSoftwareResponse.TransactionId);
                         objProperties.Add("TRANSACTIONAMOUNT", objNSoftwareResponse.GrossAmount);
-                        if ((m_objNSoftwareGWPPRefund.Ack == "SuccessWithWarning"))
+                        if ((m_objNSoftwarePPRefund.Ack == "SuccessWithWarning"))
                         {
                             m_intEEPGResponseCode = 98060;
-                            m_strEEPGResponseDescription = "Warning:  " + m_objNSoftwareGWPPRefund.Ack;
+                            m_strEEPGResponseDescription = "Warning:  " + m_objNSoftwarePPRefund.Ack;
                         }
                         //objProperties.Add("AVSRESULT", objNSoftwareResponse.AVSResult)
                     }
 				} else {
-                    //Response objNSoftwareResponse = new nsoftware.InPayPal.Response();
-                    if (m_objNSoftwareGWPPTx != null)
+                    if (m_objNSoftwarePPTx != null)
                     {
-                        RefundResponse objNSoftwareResponse = m_objNSoftwareGWPPTx.Response;
-                        if ((m_objNSoftwareGWPPTx.Ack != "Success") && (m_objNSoftwareGWPPTx.Ack != "SuccessWithWarning"))
+                        RefundResponse objNSoftwareResponse = m_objNSoftwarePPTx.Response;
+                        if (m_objNSoftwarePPTx.Ack != "Success" && m_objNSoftwarePPTx.Ack != "SuccessWithWarning")
                         {
                             // The two following variables are included to log someday
                             m_strGatewayResponseCode = "999999";
-                            m_strGatewayResponseRawData = m_objNSoftwareGW.Ack;
+                            m_strGatewayResponseRawData = m_objNSoftwarePPTx.Ack;
                             m_strGatewayResponseDescription = "Failed request from PayPal";
                             // The two following variables are what is sent back to the caller
                             m_intEEPGResponseCode = 98058;
-                            m_strEEPGResponseDescription = "Error:  " + m_objNSoftwareGW.Ack;
+                            m_strEEPGResponseDescription = "Error:  " + m_objNSoftwarePPTx.Ack;
                             blnReturn = false;
                         }
                         else
-                        {                            
+                        {
                             objProperties.Add("TRANSACTIONID", objNSoftwareResponse.TransactionId);
                             objProperties.Add("TRANSACTIONAMOUNT", objNSoftwareResponse.GrossAmount);
-                            if ((m_objNSoftwareGW.Ack == "SuccessWithWarning"))
+                            if (m_objNSoftwarePPTx.Ack == "SuccessWithWarning")
                             {
                                 m_intEEPGResponseCode = 98060;
-                                m_strEEPGResponseDescription = "Warning: SuccessWithWarning "; // + m_objNSoftwareGWPPTx.Ack; 02242014 LfZ
+                                m_strEEPGResponseDescription = "Warning: SuccessWithWarning "; // + m_objNSoftwarePPTx.Ack; 02242014 LfZ
                             }
                             //objProperties.Add("AVSRESULT", objNSoftwareResponse.AVSResult)
                         }
@@ -391,10 +386,10 @@ namespace EEPM
                         {
                             objProperties.Add("TRANSACTIONID", objNSoftwareResponse.TransactionId);
                             objProperties.Add("TRANSACTIONAMOUNT", objNSoftwareResponse.Amount);
-                            if ((m_objNSoftwareGW.Ack == "SuccessWithWarning"))
+                            if (m_objNSoftwareGW.Ack == "SuccessWithWarning")
                             {
                                 m_intEEPGResponseCode = 98060;
-                                m_strEEPGResponseDescription = "Warning: SuccessWithWarning "; // + m_objNSoftwareGWPPTx.Ack; 02242014 LfZ
+                                m_strEEPGResponseDescription = "Warning: SuccessWithWarning "; // + m_objNSoftwarePPTx.Ack; 02242014 LfZ
                             }
                             //objProperties.Add("AVSRESULT", objNSoftwareResponse.AVSResult)
                         }
@@ -409,24 +404,25 @@ namespace EEPM
 			return blnReturn;
 		}
 
-		protected override bool SetSpecialFields(ref System.Collections.Generic.Dictionary<string, string> objProperties)
-		{
-			bool blnReturn = true;
-			try {
-				if (objProperties.Count > 0) {
-					foreach (KeyValuePair<string, string> kvPair in objProperties) {
-						if ((kvPair.Key != "TRANSACTIONID") && (kvPair.Key != "TRANSACTIONAMOUNT") && (kvPair.Key != "TRANSACTIONDESC") && (kvPair.Key != "TRANSACTIONDOCUMENTNUMBER") && (kvPair.Key != "TRANSACTIONORIGINALAMOUNT")) {
-							m_objNSoftwareGW.AddCustomField(Convert.ToString(kvPair.Key), Convert.ToString(kvPair.Value));
-						}
-					}
-				}
-			} catch (System.Exception err) {
-				m_intEEPGResponseCode = 98061;
-				m_strEEPGResponseDescription = "Error:  "+ err.Message;
-				blnReturn = false;
-			}
-			return blnReturn;
-		}
+        //same as super class GenericBase.cs
+        //protected override bool SetSpecialFields(ref System.Collections.Generic.Dictionary<string, string> objProperties)
+        //{
+        //    bool blnReturn = true;
+        //    try {
+        //        if (objProperties.Count > 0) {
+        //            foreach (KeyValuePair<string, string> kvPair in objProperties) {
+        //                if ((kvPair.Key != "TRANSACTIONID") && (kvPair.Key != "TRANSACTIONAMOUNT") && (kvPair.Key != "TRANSACTIONDESC") && (kvPair.Key != "TRANSACTIONDOCUMENTNUMBER") && (kvPair.Key != "TRANSACTIONORIGINALAMOUNT")) {
+        //                    m_objNSoftwareGW.AddCustomField(Convert.ToString(kvPair.Key), Convert.ToString(kvPair.Value));
+        //                }
+        //            }
+        //        }
+        //    } catch (System.Exception err) {
+        //        m_intEEPGResponseCode = 98061;
+        //        m_strEEPGResponseDescription = "Error:  "+ err.Message;
+        //        blnReturn = false;
+        //    }
+        //    return blnReturn;
+        //}
                 
 		protected override bool SetGWObject(string strCase)
 		{
@@ -439,10 +435,10 @@ namespace EEPM
                         m_objNSoftwareCustomer = new nsoftware.InPayPal.DirectPaymentPayer();
                         break;                        
                     case "TRANSACTION":                        
-                        m_objNSoftwareGWPPRefund = new nsoftware.InPayPal.Reauthcapture();
+                        m_objNSoftwarePPRefund = new nsoftware.InPayPal.Reauthcapture();
                         break;                        
                     case "REFUND":                        
-                        m_objNSoftwareGWPPTx = new nsoftware.InPayPal.Refundtransaction();
+                        m_objNSoftwarePPTx = new nsoftware.InPayPal.Refundtransaction();
                         break;                        
 					default:
 						m_intEEPGResponseCode = 98038;
@@ -451,6 +447,7 @@ namespace EEPM
                         break;
 				}
 				m_objNSoftwareGW.RuntimeLicense = "42314E334141315355425241315355424348394535303330000000000000000000000000000000004B56553458483550000054565346504D334247574D550000";
+                //? did not change, this is from inpaypal.dll older version (4?)
 			} catch (System.Exception err) {
 				m_intEEPGResponseCode = 98062;
 				m_strEEPGResponseDescription = "Error:  "+ err.Message;
@@ -468,16 +465,6 @@ namespace EEPM
 			m_objSetGW.Add("CREDIT", "REFUND");
 			m_objSetGW.Add("VOID", "TRANSACTION");
 		}
-
-        // ###################################################################################
-        // Protected variables
-        // ###################################################################################
-
-        protected new Directpayment m_objNSoftwareGW;
-        protected Reauthcapture m_objNSoftwareGWPPRefund;
-        protected Refundtransaction m_objNSoftwareGWPPTx;
-        protected new Card m_objNSoftwareCard;
-        protected new DirectPaymentPayer m_objNSoftwareCustomer;
 
 	}
 

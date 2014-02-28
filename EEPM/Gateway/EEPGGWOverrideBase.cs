@@ -1,16 +1,10 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
-using nsoftware.InPay;
 
 namespace EEPM
 {
@@ -748,17 +742,12 @@ namespace EEPM
         /// sending HTTP POST request  lingfei  using System.Net.WebRequest and .WebResponse
         protected virtual bool PostDataToGateway()
         {
-            bool blnReturn = true;
-            string strPostData = "";
-
+            bool blnReturn = true;    
             m_objLog.LogMessage("CustomGWPostGateway: PostDataToGateway: Entering.", 40);
-
 
             try
             {
-                strPostData += BuildRequest();
-                strPostData += "&" + Card.BuildRequest();
-                strPostData += "&" + Customer.BuildRequest();
+                string strPostData =BuildRequest() + "&" + Card.BuildRequest() + "&" + Customer.BuildRequest();
 
                 blnReturn = !string.IsNullOrEmpty(strPostData);
                 if ((blnReturn))
@@ -776,7 +765,7 @@ namespace EEPM
                     m_objDataStream.Close();
 
                     m_objWebResponse = m_objWebRequest.GetResponse();
-                    if ( Convert.ToInt32( ((HttpWebResponse)m_objWebResponse).StatusCode) == 200)
+                    if ( Convert.ToInt32(((HttpWebResponse)m_objWebResponse).StatusCode) == 200)
                     {
                         m_objDataStream = m_objWebResponse.GetResponseStream();
                         m_objDataStreamReader = new StreamReader(m_objDataStream);

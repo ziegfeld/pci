@@ -1,12 +1,4 @@
-﻿
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-
-
-
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace EEPM
@@ -267,30 +259,27 @@ namespace EEPM
 		{
 			bool blnReturn = false;
 			m_objLog.LogMessage("EEPMGWBase: ContainKeyCheck(): " + strKey, 40);
-			blnReturn = objProperties.ContainsKey(strKey);
-			if (blnReturn) {
-				if ((String.IsNullOrEmpty(objProperties[strKey]))) {
+			if (objProperties.ContainsKey(strKey))                 
+				if (String.IsNullOrEmpty(objProperties[strKey])) {
 					objProperties.Remove(strKey);
 					blnReturn = false;
-				}
-			}
+				} else
+                    blnReturn = true;
 			m_objLog.LogMessage("EEPMGWBase: ContainKeyCheck(): " + blnReturn, 40);
 			return blnReturn;
 		}
 
-		// Read the key value out and remove it from objProperties Dictionary. LZ 122713
+		// Read the key value out and REMOVE it from objProperties Dictionary. LZ 122713
 		protected virtual string ProcessKey(ref System.Collections.Generic.Dictionary<string, string> objProperties, string strKey)
 		{
 			string strReturn = "";
 			m_objLog.LogMessage("EEPMGWBase: ProcessKey(): " + strKey, 40);
-			if ((objProperties.ContainsKey(strKey))) {
-				if ((!string.IsNullOrEmpty(objProperties[strKey])))
-					strReturn = Convert.ToString(objProperties[strKey]);
+			if (objProperties.ContainsKey(strKey)) {
+				if (!string.IsNullOrEmpty(objProperties[strKey]))
+					strReturn = objProperties[strKey];
 				objProperties.Remove(strKey);
 			}
-
 			m_objLog.LogMessage("EEPMGWBase: ProcessKey(): " + strReturn, 100);
-
 			return strReturn;
 		}
 

@@ -180,18 +180,6 @@ namespace EEPM
             }
         }
 
-        //Public Sub AddNameValue(ByVal strName As String, ByVal intValue As Integer)
-        //    'm_objLog.LogMessage("EEGateway: AddNameValue(): " + strName + "-" + intValue, 40)
-        //    If (m_objProperties.ContainsKey(strName)) Then m_objProperties.Remove(strName)
-        //    m_objProperties.Add(strName, intValue)
-        //End Sub
-
-        //Public Sub AddNameValue(ByVal strName As String, ByVal dblValue As Double)
-        //    'm_objLog.LogMessage("EEGateway: AddNameValue(): " + strName + "-" + dblValue, 40)
-        //    If (m_objProperties.ContainsKey(strName)) Then m_objProperties.Remove(strName)
-        //    m_objProperties.Add(strName, dblValue)
-        //End Sub
-
         public string GetNameValue(string strName)
         {
             m_objLog.LogMessage("EEGateway: GetNameValue(): " + strName, 100);
@@ -254,7 +242,17 @@ namespace EEPM
 
             return blnReturn;
         }
-
+        /// nsoftware.InPay
+        //    public enum IchargeGateways
+        //    { gwNoGateway = 0,  gwAuthorizeNet = 1, gwEprocessing = 2, gwIntellipay = 3, gwITransact = 4, gwNetBilling = 5, gwPayFlowPro = 6, gwUSAePay = 7, gwPlugNPay = 8, gwPlanetPayment = 9, gwMPCS = 10,
+        //      gwRTWare = 11, gwECX = 12, gwBankOfAmerica = 13, gwInnovative = 14, gwMerchantAnywhere = 15, gwSkipjack = 16, gwIntuitPaymentSolutions = 17, gw3DSI = 18, gwTrustCommerce = 19, gwPSIGate = 20, 
+        //      gwPayFuse = 21, gwPayFlowLink = 22, gwOrbital = 23, gwLinkPoint = 24, gwMoneris = 25, gwUSight = 26, gwFastTransact = 27, gwNetworkMerchants = 28, gwOgone = 29, gwPRIGate = 30, gwMerchantPartners = 31, 
+        //      gwCyberCash = 32, gwFirstData = 33, gwYourPay = 34, gwACHPayments = 35, gwPaymentsGateway = 36, gwCyberSource = 37, gwEway = 38, gwGoEMerchant = 39, gwTransFirst = 40, gwChase = 41, gwNexCommerce = 42,
+        //      gwWorldPay = 43, gwTransactionCentral = 44, gwSterling = 45, gwPayJunction = 46, gwSECPay = 47, gwPaymentExpress = 48, gwMyVirtualMerchant = 49, gwSagePayments = 50, gwSecurePay = 51, gwMonerisUSA = 52,
+        //      gwBeanstream = 53, gwVerifi = 54, gwSagePay = 55, gwMerchantESolutions = 56, gwPayLeap = 57, gwPayPoint = 58, gwWorldPayXML = 59, gwProPay = 60, gwQBMS = 61, gwHeartland = 62, gwLitle = 63, 
+        //      gwBrainTree = 64,  gwJetPay = 65, gwHSBC = 66, gwBluePay = 67, gwAdyen = 68, gwBarclay = 69, gwPayTrace = 70, gwYKC = 71, gwCyberbit = 72, gwGoToBilling = 73, gwTransNationalBankcard = 74, gwNetbanx = 75, 
+        //      gwMIT = 76, gwDataCash = 77, gwACHFederal = 78, gwGlobalIris = 79, gwFirstDataE4 = 80, gwFirstAtlantic = 81, gwBluefin = 82, gwPayscape = 83, gwPayDirect = 84, 
+        // nsoftware.InPay.IchargeGateways.gwPayFlowPro = 6
         protected virtual bool DetermineGatewayObject()
         {
             bool blnReturn = true;
@@ -267,12 +265,12 @@ namespace EEPM
                     errorGatewayUnsupported(m_intGatewayID);
                     blnReturn = false;
                     break;
-                case 10:
+                case 10:  
                     // PayFlow Pro
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPGGWCCPayFlowPro(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPGGWCCPayFlowPro(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwPayFlowPro), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -285,7 +283,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCOrbital(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCOrbital(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwOrbital), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -298,7 +296,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCEWay(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCEWay(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwEway), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -311,7 +309,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCFDGlobal(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCFDGlobal(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwFirstData), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -324,7 +322,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCCyberSource(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCCyberSource(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwCyberSource), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -337,7 +335,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCBarclayEDPQ(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCBarclayEDPQ(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwBarclay), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -362,10 +360,12 @@ namespace EEPM
                 case 101:
                     // Chase PaymentTech Direct Payment using Ptech.dll, depricated. 02212014. NSfotware's new integrator is called Direct integrator V6 
                     switch (m_intPaymentType)
-                    {   // commented  02212014 LfZ
-                        //case 0:
+                    {   
+                        case 0:
+                            errorGatewayUnsupported(m_intGatewayID); //added 02282014 LfZ
+                        // commented  02212014 LfZ
                         //    m_objEEPG = new EEPMGWCCPaymentTech(m_intGatewayID, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, m_objLog);
-                        //    break;
+                            break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
                             blnReturn = false;
@@ -399,11 +399,11 @@ namespace EEPM
                             {
                                 case "Tokens":
                                     ///' TODO test
-                                    m_objEEPG = new EEPMGWCCSagePayToken(55, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                                    m_objEEPG = new EEPMGWCCSagePayToken(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwSagePay), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                                     break;
                                 case "Encrpytion":
                                     ///''TODO test
-                                    m_objEEPG = new EEPMGWCCSagePay(55, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                                    m_objEEPG = new EEPMGWCCSagePay(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwSagePay), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                                     break;
                                 default:
                                     errorSecurityProfileUnsupported(m_intGatewayID);
@@ -422,7 +422,7 @@ namespace EEPM
                     switch (m_intPaymentType)
                     {
                         case 0:
-                            m_objEEPG = new EEPMGWCCFDE4(80, m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
+                            m_objEEPG = new EEPMGWCCFDE4(Convert.ToInt32(nsoftware.InPay.IchargeGateways.gwFirstDataE4), m_strGatewayURL, m_strMerchantLogin, m_strMerchantPassword, ref m_objLog);
                             break;
                         default:
                             errorPaymentTypeUnsupported(m_intPaymentType);
@@ -486,7 +486,7 @@ namespace EEPM
             try
             {
                 m_intResponseCode = 98522;
-                //new error code, yet it is not 9800x to show its level.
+                //new error code, but better use 980xx for consistency with those from other functions in this class.
                 m_strResponseDescription = "Gateway Security Profile type " + strGatewaySecurityProfile + " not supported";
             }
             catch

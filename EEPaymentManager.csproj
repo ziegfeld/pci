@@ -64,12 +64,13 @@
     <Compile Include="EEBase\EECM.cs" />
     <Compile Include="EEPM\Gateway\EEPGGWBase.cs" />
     <Compile Include="EEPM\Gateway\EEPGGWOverrideBase.cs" />
+    <Compile Include="EEPM\Gateway\GWCreditCard\EEPGGWCCOgoneCustom.cs" />
     <Compile Include="EEPM\Gateway\GWCreditCard\EEPGGWCCOrbital.cs" />
     <Compile Include="EEPM\Gateway\GWCreditCard\EEPGGWCCPayFlowPro.cs" />
-    <Compile Include="EEPM\Gateway\GWCreditCard\EEPMGWCCSagePayToken.cs" />
+    <Compile Include="EEPM\Gateway\GWCreditCard\EEPGGWCCSagePayToken.cs" />
     <Compile Include="EEPM\Gateway\GWCreditCard\EEPMGWCCCyberSource.cs" />
     <Compile Include="EEPM\Gateway\GWCreditCard\EEPMGWCCPayPal.cs" />
-    <Compile Include="EEPM\Gateway\GWCreditCard\EEPMGWCCSagePay.cs" />
+    <Compile Include="EEPM\Gateway\GWCreditCard\EEPGGWCCSagePay.cs" />
     <Compile Include="EEPM\EECCValidator.cs" />
     <Compile Include="EEPM\EEGateway.cs" />
     <Compile Include="EEPM\Gateway\GWCreditCard\EEPGGWCCBarclayEDPQ.cs" />
