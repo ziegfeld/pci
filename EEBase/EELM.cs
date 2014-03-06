@@ -67,20 +67,20 @@ namespace Enterprise
 
         public virtual void SetRegistryInformation(string strRoot = "", string strProductHive = "", string strProductVersion = "", string strInstance = "")
         {
-            if ((!string.IsNullOrEmpty(strRoot)))
+            if (!string.IsNullOrEmpty(strRoot))
                 m_objRegistry.Root = strRoot;
-            if ((!string.IsNullOrEmpty(strProductHive)))
+            if (!string.IsNullOrEmpty(strProductHive))
                 m_objRegistry.ProductHive = strProductHive;
-            if ((!string.IsNullOrEmpty(strProductVersion)))
+            if (!string.IsNullOrEmpty(strProductVersion))
                 m_objRegistry.ProductVersion = strProductVersion;
-            if ((!string.IsNullOrEmpty(strInstance)))
+            if (!string.IsNullOrEmpty(strInstance))
                 m_objRegistry.Instance = strInstance;
             LogPath = m_objRegistry.ProductGetKeyValue("LogLocation");
-            if ((string.IsNullOrEmpty(LogPath)))
+            if (string.IsNullOrEmpty(LogPath))
                 LogPath = "C:\\Logs\\";
-            if ((!string.IsNullOrEmpty(m_objRegistry.ProductGetKeyValue("LogEnabled"))))
+            if (!string.IsNullOrEmpty(m_objRegistry.ProductGetKeyValue("LogEnabled")))
                 LogEnabled = m_objRegistry.ProductGetKeyValue("LogEnabled") == "1";
-            if ((!string.IsNullOrEmpty(m_objRegistry.ProductGetKeyValue("LogLevel"))))
+            if (!string.IsNullOrEmpty(m_objRegistry.ProductGetKeyValue("LogLevel")))
                 LogLevel = Convert.ToInt32(m_objRegistry.ProductGetKeyValue("LogLevel"));
         }
 

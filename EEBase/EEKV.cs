@@ -396,7 +396,7 @@ namespace Enterprise
             ProductVersion = strProductVersion;
             Instance = strInstance;
 
-            if ((objLog != null))
+            if (objLog != null)
                 m_objLog = objLog;
             else
                 m_objLog = new Enterprise.EELog(Root, ProductHive, ProductVersion, "");
@@ -838,11 +838,11 @@ namespace Enterprise
             m_objLog.LogMessage("Check Force. ((intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks): "
                 + ((intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks) + " : "
                 + intPseudoJulianDate + " : " + intSKDLastSuccessfulDate + " : " + intSKDDaysBetweenChecks, 35);
-            if (!(blnForceCheck))
-                blnForceCheck = ((intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks);
+            if (!blnForceCheck)
+                blnForceCheck = (intPseudoJulianDate - intSKDLastSuccessfulDate) > intSKDDaysBetweenChecks;
             // Force if max days allowed reached
             m_objLog.LogMessage("Check Force. (intSKDAttemptedCommTries > 0): " + (intSKDAttemptedCommTries > 0) + " : " + intSKDAttemptedCommTries, 35);
-            if (!(blnForceCheck))
+            if (!blnForceCheck)
                 blnForceCheck = (intSKDAttemptedCommTries > 0);
             // Force if Comm tries have been failing.
 
@@ -854,7 +854,7 @@ namespace Enterprise
             char chrRandomCharMatch = SpecificKey[9];
             // Use the last letter of the Product Hive as the match control
             if (!blnForceCheck)
-                if ((chrRandomCharMatch == chrRandomChar))
+                if (chrRandomCharMatch == chrRandomChar)
                     blnRandomCheck = (intSKDDailyRandomMatches <= intSKDMaxDailyChecksAllowed);
 
             if (blnRandomCheck || blnForceCheck)
@@ -896,9 +896,9 @@ namespace Enterprise
                 }
                 else
                 {
-                    if ((intSKDAttemptedCommTries == 0))
+                    if (intSKDAttemptedCommTries == 0)
                         SetCaptureTotal(0);
-                    if ((intSKDAttemptedCommTries == 0))
+                    if (intSKDAttemptedCommTries == 0)
                         m_objLog.LogMessage("SpecificKeyDat Success (With Comm Failure): " + strSpecificKeyDatResponse, 30);
                     else
                         m_objLog.LogMessage("SpecificKeyDat Success: " + strSpecificKeyDatResponse, 30);
@@ -919,25 +919,24 @@ namespace Enterprise
                 m_objLog.LogMessage("SpecificKeyDat Skipped: " + intPseudoJulianDate + " : " + strSpecificKeyDat.Substring(5, 5) + " # " + chrRandomChar + " : " + chrRandomCharMatch, 30);
 
                 string strOldSpecificKeyDat = strSpecificKeyDat;
-                strSpecificKeyDat = "";
-                strSpecificKeyDat += strOldSpecificKeyDat.Substring(0, 5);
-                strSpecificKeyDat += Convert.ToString(intPseudoJulianDate);
-                strSpecificKeyDat += strOldSpecificKeyDat.Substring(10, 4);
+                strSpecificKeyDat = strOldSpecificKeyDat.Substring(0, 5)
+                    + Convert.ToString(intPseudoJulianDate)
+                    + strOldSpecificKeyDat.Substring(10, 4);
             }
 
-            if ((blnRandomCheck))
+            if (blnRandomCheck)
                 strSpecificKeyDat += Convert.ToString(intSKDDailyRandomMatches + 1);
             else
                 strSpecificKeyDat += Convert.ToString(intSKDDailyRandomMatches);
             strSpecificKeyDat += Convert.ToString(chrRandomChar)
-                              + Convert.ToString((int)'a' + (intSKDAttemptedCommTries / 26))
-                              + Convert.ToString((int)'a' + (intSKDAttemptedCommTries % 26))
-                              + Convert.ToString((int)'a' + intSKDDaysOfFailedComm)
-                              + Convert.ToString(chrRandomChar)
+                              + Convert.ToChar((int)'a' + (intSKDAttemptedCommTries / 26))
+                              + Convert.ToChar((int)'a' + (intSKDAttemptedCommTries % 26))
+                              + Convert.ToChar((int)'a' + intSKDDaysOfFailedComm)
+                              + chrRandomChar
                               + Convert.ToString(intSKDCountOfUsage + 1).PadLeft(2, '0');
 
             m_objRegistry.ProductCreateValueEntry("SpecificKeyDat", strSpecificKeyDat);
-            if ((!string.IsNullOrEmpty(strSpecificKeyDatMessage)))
+            if (!string.IsNullOrEmpty(strSpecificKeyDatMessage))
                 m_objRegistry.ProductCreateValueEntry("SpecificKeyDatMessage", strSpecificKeyDatMessage);
 
             m_objLog.LogMessage("EESpecificKeyClient: CheckSpecificKeyDat(): " + blnReturn, 40);
@@ -997,7 +996,7 @@ namespace Enterprise
             // what should be the class? 02212014 LfZ
             EEPaymentManager.EEKMWeb.EEKMWeb objReturn = new EEPaymentManager.EEKMWeb.EEKMWeb();
 
-            if ((string.IsNullOrEmpty(strServiceURL)))
+            if (string.IsNullOrEmpty(strServiceURL))
                 strServiceURL = m_objRegistry.ProductGetKeyValue("lclOverrideURL");
             else {
                 objReturn.Url = strServiceURL + "/EEKMWeb.asmx";
@@ -1106,7 +1105,7 @@ namespace Enterprise
             // m_objLog.LogMessage("EESpecificKeyClient: SetCaptureTotal(): " + intTotal, 125)
             // #End If
 
-            if ((intTotal > 2500000))
+            if (intTotal > 2500000)
                 intTotal = 2500000;
 
             char strMultiplier = (char) ('a' + intTotal / 100000);
@@ -1247,11 +1246,11 @@ namespace Enterprise
 
         public string SpecificKeyIndex(int intIndex, char chr, bool blnSaveKey = false)
         {
-            if ((chr == 0)) // '\0' or 0
+            if (chr == 0) // '\0' or 0
                 return "";
             m_objSpecificKey[intIndex - 1] = chr;
             string strSpecificKey = SpecificKey;
-            if ((blnSaveKey))
+            if (blnSaveKey)
                 m_objRegistry.ProductCreateValueEntry("SpecificKey", strSpecificKey);
             return strSpecificKey;
         }

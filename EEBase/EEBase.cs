@@ -107,7 +107,7 @@ namespace Enterprise
                 //if any of the 3 is not Null, then setup a new base? Lingfei1118
                 GetKeyInfo();
             }
-            if ((!string.IsNullOrEmpty(m_strBaseKey)))
+            if (!string.IsNullOrEmpty(m_strBaseKey))
             {
                 Enterprise.EEBaseKeyChecker objKeyChecker = new Enterprise.EEBaseKeyChecker(m_strProductVersion, m_strProductHive, m_strProductCipherLength, m_strCustomerNumber, m_strBaseKey, ref m_objLog);
                 blnReturn = objKeyChecker.CheckKey();

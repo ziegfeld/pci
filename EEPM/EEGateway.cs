@@ -76,9 +76,9 @@ namespace EEPM
             if (!(CheckInternalLicenses(4)))
                 return false;
 
-            if (!(CheckReady()))
+            if (!CheckReady())
                 return false;
-            if (!(DetermineGatewayObject()))
+            if (!DetermineGatewayObject())
                 return false;
             return m_objEEPG.Authorize(ref m_objProperties);
 
@@ -91,7 +91,8 @@ namespace EEPM
             // return the token uid string given by gateway
             m_objLog.LogMessage("EEGateway: Tokenize()", 40);
 
-            // If Not (CheckInternalLicenses(123) Then Return False   '''' licensing
+            if (!CheckInternalLicenses(4)) //just using the same licensing section as Authorize().
+                return "";
             if (!CheckReady())
                 return "ErrorNotReady";
             if (!DetermineGatewayObject())

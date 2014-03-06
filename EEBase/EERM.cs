@@ -96,13 +96,13 @@ namespace Enterprise
             string strReturn = "";
             lock (m_objLock)
             {
-                if ((!string.IsNullOrEmpty(strRoot)))
+                if (!string.IsNullOrEmpty(strRoot))
                     Root = strRoot;
-                if ((!string.IsNullOrEmpty(strProductHive)))
+                if (!string.IsNullOrEmpty(strProductHive))
                     ProductHive = strProductHive;
-                if ((!string.IsNullOrEmpty(strProductVersion)))
+                if (!string.IsNullOrEmpty(strProductVersion))
                     ProductVersion = strProductVersion;
-                if ((!string.IsNullOrEmpty(strInstance)))
+                if (!string.IsNullOrEmpty(strInstance))
                     Instance = strInstance;
                 strReturn = GetValueEntry(KeyPath, strKeyName);
             }
@@ -169,11 +169,11 @@ namespace Enterprise
             bool blnReturn = false;
             lock (m_objLock)
             {
-                if ((!string.IsNullOrEmpty(strRoot)))
+                if (!string.IsNullOrEmpty(strRoot))
                     Root = strRoot;
-                if ((!string.IsNullOrEmpty(strProductHive)))
+                if (!string.IsNullOrEmpty(strProductHive))
                     ProductHive = strProductHive;
-                if ((!string.IsNullOrEmpty(strProductVersion)))
+                if (!string.IsNullOrEmpty(strProductVersion))
                     ProductVersion = strProductVersion;
                 blnReturn = (!string.IsNullOrEmpty(SetValueEntry(KeyPath, strValueName, strValueValue, blnUpdateExisting, false)));
             }
@@ -204,7 +204,7 @@ namespace Enterprise
             ProductHive = strProductHive;
             ProductVersion = strProductVersion;
             Instance = strInstance;
-            if ((m_objLock == null))
+            if (m_objLock == null)
                 m_objLock = new object();
         }
 
@@ -305,9 +305,9 @@ namespace Enterprise
             try
             {
                 objValue = objRegKey.GetValue(strEntryName);
-                if ((!string.IsNullOrEmpty(objValue.ToString())))
+                if (!string.IsNullOrEmpty(objValue.ToString()))
                 {
-                    if ((blnUpdateExisting))
+                    if (blnUpdateExisting)
                     {
                         if (strEntryName.Substring(0, 11) == "SpecificKey")
                             objRegKey.SetValue(strEntryName, ObfuscateKey(strEntryValue));
@@ -323,10 +323,10 @@ namespace Enterprise
                         objRegKey.SetValue(strEntryName, strEntryValue);
                 }
                 objValue = objRegKey.GetValue(strEntryName);
-                if ((objValue.ToString() != strEntryValue))
-                    strReturn = "";
+                if (objValue.ToString() != strEntryValue)
+                    strReturn = ""; // happens when it is "SpecificKey" or "SpecificKeyXXXXXX.."
                 else
-                    strReturn = objValue.ToString();
+                    strReturn = strEntryValue;// objValue.ToString();
             }
             catch
             {
