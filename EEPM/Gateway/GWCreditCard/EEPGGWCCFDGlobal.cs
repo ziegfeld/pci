@@ -92,25 +92,26 @@ namespace EEPM
                 nsoftware.InPay.EPResponse objNSoftwareResponse = new nsoftware.InPay.EPResponse();
                 objNSoftwareResponse = m_objNSoftwareGW.Response;
 
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): ApprovalCode: " + objNSoftwareResponse.ApprovalCode, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): Approved: " + objNSoftwareResponse.Approved, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): AVSResult: " + objNSoftwareResponse.AVSResult, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): Code: " + objNSoftwareResponse.Code, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): CVVResult: " + objNSoftwareResponse.CVVResult, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): Data: " + objNSoftwareResponse.Data, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): ErrorCode: " + objNSoftwareResponse.ErrorCode, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): ErrorText: " + objNSoftwareResponse.ErrorText, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): InvoiceNumber: " + objNSoftwareResponse.InvoiceNumber, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): ProcessorCode: " + objNSoftwareResponse.ProcessorCode, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): Text: " + objNSoftwareResponse.Text, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): TransactionId: " + objNSoftwareResponse.TransactionId, 35);
-                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse(): Timestamp: " + m_objNSoftwareGW.GetResponseVar("/root/r_tdate"), 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: ApprovalCode: " + objNSoftwareResponse.ApprovalCode, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: Approved: " + objNSoftwareResponse.Approved, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: AVSResult: " + objNSoftwareResponse.AVSResult, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: Code: " + objNSoftwareResponse.Code, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: CVVResult: " + objNSoftwareResponse.CVVResult, 35);
+                m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;
+                m_strGatewayResponseRawData = objNSoftwareResponse.Data;
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: RawData: " + m_strGatewayResponseRawData, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: ErrorCode: " + m_strGatewayResponseCode, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: ErrorText: " + objNSoftwareResponse.ErrorText, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: InvoiceNumber: " + objNSoftwareResponse.InvoiceNumber, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: ProcessorCode: " + objNSoftwareResponse.ProcessorCode, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: Text: " + objNSoftwareResponse.Text, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: TransactionId: " + objNSoftwareResponse.TransactionId, 35);
+                m_objLog.LogMessage("FDGlobal: ReadGatewayResponse: Timestamp: " + m_objNSoftwareGW.GetResponseVar("/root/r_tdate"), 35);
 
                 if (!(objNSoftwareResponse.Approved))
                 {
                     // The two following variables are included to log someday
-                    m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;
-                    m_strGatewayResponseRawData = objNSoftwareResponse.Data;
+                    
                     m_strGatewayResponseDescription = objNSoftwareResponse.ErrorText;
                     // The two following variables are what is sent back to the caller
                     m_intEEPGResponseCode = 98013;

@@ -79,16 +79,15 @@ namespace EEPM
                 nsoftware.InPay.EPResponse objNSoftwareResponse = new nsoftware.InPay.EPResponse();
                 objNSoftwareResponse = m_objNSoftwareGW.Response;
 
-                m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: Response.Data: " + objNSoftwareResponse.Data, 35);
+                m_strGatewayResponseRawData = objNSoftwareResponse.Data;
+                m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: ResponseRawData: " + m_strGatewayResponseRawData, 35);
                 m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: Response.Var: STATUS: " + m_objNSoftwareGW.GetResponseVar("STATUS"), 35);
 
 
                 // A STATUS respone of 46 denotes a request for 3D secure.  We need to log the data as needed.
                 if (!(objNSoftwareResponse.Approved) && (m_objNSoftwareGW.GetResponseVar("STATUS") != "46"))
                 {
-                    // The two following variables are included to log someday
                     m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;
-                    m_strGatewayResponseRawData = objNSoftwareResponse.Data;
                     //m_strGatewayResponseDescription = objNSoftwareResponse.ErrorText
                     m_strGatewayResponseDescription = objNSoftwareResponse.Text;
                     // The two following variables are what is sent back to the caller
@@ -97,7 +96,6 @@ namespace EEPM
                     m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: ReadGatewayResponse: ResponseCode: " + m_strGatewayResponseCode, 50);
                     m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: ReadGatewayResponse: ResponseText: " + m_strGatewayResponseDescription, 50);
                     m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: ReadGatewayResponse: ResponseErrorText: " + objNSoftwareResponse.ErrorText, 50);
-                    m_objLog.LogMessage("EEPMGWCCBarclayEDPQ: ReadGatewayResponse: ResponseRawData: " + m_strGatewayResponseRawData, 50);
                     blnReturn = false;
                 }
                 else

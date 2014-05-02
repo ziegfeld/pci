@@ -65,18 +65,17 @@ namespace EEPM
 
 			try {
 				OgoneResponse objNSoftwareResponse = (OgoneResponse) m_objNSoftwareGW.Response;
-
-				m_objLog.LogMessage("EEPGGWCCOgone: Response.Data: " + objNSoftwareResponse.Data, 35);
+                m_strGatewayResponseRawData = objNSoftwareResponse.Data;
+                m_objLog.LogMessage("EEPGGWCCOgone: ResponseRawData: " + m_strGatewayResponseRawData, 35);
 
 				if (!(objNSoftwareResponse.Approved)) {
-					// The two following variables are included to log someday
-					m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;
-					m_strGatewayResponseRawData = objNSoftwareResponse.Data;
+					// The following variable is included to log someday
+					m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;					
 					m_strGatewayResponseDescription = objNSoftwareResponse.ErrorText;
 					// The two following variables are what is sent back to the caller
-					m_intEEPGResponseCode = 98013;
-					//m_strEEPGResponseDescription = "Error:  " + "Danger Will Robinson."
+					m_intEEPGResponseCode = 98013;					
 					m_strEEPGResponseDescription = "Error:  " + objNSoftwareResponse.Code + " : " + objNSoftwareResponse.Text;
+                    //m_strEEPGResponseDescription = "Error:  " + "Danger Will Robinson."
 					blnReturn = false;
 				} else {
 					objProperties.Add("TRANSACTIONID", objNSoftwareResponse.TransactionId);

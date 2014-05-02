@@ -39,7 +39,7 @@ namespace EEPaymentManager.EEKMWeb {
         
         /// <remarks/>
         public EEKMWeb() {
-            this.Url = global::EEPaymentManager.Properties.Settings.Default.EEPaymentManager_EEKMWeb_EEKMWeb;
+            this.Url = global::EEPaymentManager.Properties.Settings.Default.EEPaymentManager_com_pcicharge_licensing_EEKMWeb;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;

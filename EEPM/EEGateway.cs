@@ -91,7 +91,7 @@ namespace EEPM
             // return the token uid string given by gateway
             m_objLog.LogMessage("EEGateway: Tokenize()", 40);
 
-            if (!CheckInternalLicenses(4)) //just using the same licensing section as Authorize().
+            if (!CheckInternalLicenses(29)) // licensing bit changed to 29 as Mike did in March
                 return "";
             if (!CheckReady())
                 return "ErrorNotReady";
@@ -100,9 +100,7 @@ namespace EEPM
             return m_objEEPG.Tokenize(strPlainText, ref m_objProperties);
 
         }
-
-
-
+        
         public virtual bool Capture()
         {
 
@@ -161,9 +159,7 @@ namespace EEPM
             if (!DetermineGatewayObject())
                 return false;
             return m_objEEPG.VoidTransaction(ref m_objProperties);
-
         }
-
 
         public void AddNameValue(string strName, string strValue)
         {

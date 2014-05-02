@@ -518,15 +518,13 @@ namespace EEPM
                 nsoftware.InPay.EPResponse objNSoftwareResponse = new nsoftware.InPay.EPResponse();
                 objNSoftwareResponse = m_objNSoftwareGW.Response;
 
-                m_objLog.LogMessage("Generic: Response.Data: " + objNSoftwareResponse.Data, 35);
+                m_objLog.LogMessage("Generic: ResponseRawData: " + objNSoftwareResponse.Data, 35);
 
-                if (!(objNSoftwareResponse.Approved))
+                if (!objNSoftwareResponse.Approved)
                 {
-                    // The two following variables are included to log someday
                     m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;
                     m_strGatewayResponseRawData = objNSoftwareResponse.Data;
-                    //m_strGatewayResponseDescription = objNSoftwareResponse.ErrorText
-                    m_strGatewayResponseDescription = objNSoftwareResponse.Text;
+                    m_strGatewayResponseDescription = objNSoftwareResponse.Text; // or ?? objNSoftwareResponse.ErrorText
                     // The two following variables are what is sent back to the caller
                     m_intEEPGResponseCode = 98013;
                     m_strEEPGResponseDescription = "Error:  " + objNSoftwareResponse.Code + " : " + objNSoftwareResponse.Text;

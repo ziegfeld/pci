@@ -320,22 +320,19 @@ namespace EEPM
 				//'DEBUG:    m_objLog.LogMessage("Lingfei 010614: Full Request: " + m_objNSoftwareGW.Config("FullRequest"))
 				nsoftware.InPay.EPResponse objNSoftwareResponse = new nsoftware.InPay.EPResponse();
 				objNSoftwareResponse = m_objNSoftwareGW.Response;
-				m_objLog.LogMessage("EEPMGWCCSagePay: Response.Data: " + objNSoftwareResponse.Data, 35);
+                m_strGatewayResponseRawData = objNSoftwareResponse.Data;
+                m_objLog.LogMessage("EEPMGWCCSagePay: ResponseRawData: " + m_strGatewayResponseRawData, 35);
 				m_objLog.LogMessage("EEPMGWCCSagePay: Response.Var: STATUS: " + m_objNSoftwareGW.GetResponseVar("STATUS"), 35);
-				if ((!objNSoftwareResponse.Approved)) {
-					// The two following variables are included to log someday
+				if (!objNSoftwareResponse.Approved) {
 					objProperties.Add("STATUS", m_objNSoftwareGW.GetResponseVar("STATUS"));
 					m_strGatewayResponseCode = objNSoftwareResponse.ErrorCode;
-					m_strGatewayResponseRawData = objNSoftwareResponse.Data;
-					//m_strGatewayResponseDescription = objNSoftwareResponse.ErrorText
-					m_strGatewayResponseDescription = objNSoftwareResponse.Text;
+                    m_strGatewayResponseDescription = objNSoftwareResponse.Text; // or objNSoftwareResponse.ErrorText ?
 					// The two following variables are what is sent back to the caller
 					m_intEEPGResponseCode = 98515;
 					m_strEEPGResponseDescription = "Error:  " + objNSoftwareResponse.Code + " : " + objNSoftwareResponse.Text;
 					m_objLog.LogMessage("EEPMGWCCSagePay: ReadGatewayResponse: ResponseCode: " + m_strGatewayResponseCode, 50);
 					m_objLog.LogMessage("EEPMGWCCSagePay: ReadGatewayResponse: ResponseText: " + m_strGatewayResponseDescription, 50);
 					m_objLog.LogMessage("EEPMGWCCSagePay: ReadGatewayResponse: ResponseErrorText: " + objNSoftwareResponse.ErrorText, 50);
-					m_objLog.LogMessage("EEPMGWCCSagePay: ReadGatewayResponse: ResponseRawData: " + m_strGatewayResponseRawData, 50);
 					blnReturn = false;
 				} else {
 					objProperties.Add("AVSRESULT", objNSoftwareResponse.AVSResult);
@@ -350,9 +347,9 @@ namespace EEPM
 
 					//'raw data TxAuthNo = Response.ApprovalCode  = TxAuthNo
 					//'raw data SecurityKey = Response.ProcessorCode = SECURITYKEY
-					if ((!string.IsNullOrEmpty(objNSoftwareResponse.ProcessorCode)))
+					if (!string.IsNullOrEmpty(objNSoftwareResponse.ProcessorCode))
 						objProperties.Add("SECURITYKEY", objNSoftwareResponse.ProcessorCode);
-					if ((!string.IsNullOrEmpty(objNSoftwareResponse.ApprovalCode)))
+					if (!string.IsNullOrEmpty(objNSoftwareResponse.ApprovalCode))
 						objProperties.Add("TXAUTHNO", objNSoftwareResponse.ApprovalCode);
 					// is this so?
 

@@ -312,6 +312,7 @@ namespace EEPM
 			return blnReturn;
 		}
 
+        // TODO: add log for respons raw data and stuffs.
 		protected override bool ReadGatewayResponse(ref System.Collections.Generic.Dictionary<string, string> objProperties)
 		{
 			bool blnReturn = true;
